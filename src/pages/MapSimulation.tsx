@@ -178,6 +178,7 @@ const MapSimulationPage = () => {
       led_annual_savings: number;
       investment_value_dc: number;
       investment_value_ac: number;
+      investment_savings: number;
     };
   }
 
@@ -632,7 +633,7 @@ const MapSimulationPage = () => {
                         <div className="text-xs text-muted-foreground mb-1">Savings vs Traditional AC</div>
                         <div className="text-2xl font-heading font-black text-accent">
                           {freguesiaData.dc.investment_value_ac > 0
-                            ? (((freguesiaData.dc.investment_value_ac - freguesiaData.dc.investment_value_dc) / freguesiaData.dc.investment_value_ac) * 100).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%"
+                            ? ((freguesiaData.dc.investment_savings)).toFixed(1) + "%"
                             : "N/A"}
                         </div>
                       </div>
