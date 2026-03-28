@@ -563,7 +563,7 @@ const MapSimulationPage = () => {
                       </div>
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs text-muted-foreground mb-1">Percentage of LEDs</div>
-                        <div className="text-2xl font-heading font-black">{freguesiaData.led.led_percentage}</div>
+                        <div className="text-2xl font-heading font-black">{typeof freguesiaData.led.led_percentage === "number" ? freguesiaData.led.led_percentage.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%" : String(freguesiaData.led.led_percentage).replace(".", ",")}</div>
                       </div>
                     </div>
                   </div>
@@ -632,7 +632,7 @@ const MapSimulationPage = () => {
                         <div className="text-xs text-muted-foreground mb-1">Savings vs Traditional AC</div>
                         <div className="text-2xl font-heading font-black text-accent">
                           {freguesiaData.dc.investment_value_ac > 0
-                            ? (((freguesiaData.dc.investment_value_ac - freguesiaData.dc.investment_value_dc) / freguesiaData.dc.investment_value_ac) * 100).toFixed(1) + "%"
+                            ? (((freguesiaData.dc.investment_value_ac - freguesiaData.dc.investment_value_dc) / freguesiaData.dc.investment_value_ac) * 100).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%"
                             : "N/A"}
                         </div>
                       </div>
