@@ -5,9 +5,26 @@ import type { Layer, LeafletMouseEvent, LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import districtsGeoJSON from "@/assets/portugal-districts.json";
 
 type GeoJSONData = GeoJSON.FeatureCollection;
+
+function normalizePlaceName(value: string | null | undefined): string {
+  return (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+}
+
+function slugifyPlaceName(value: string | null | undefined): string {
+  return (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 const colors = {
   default: { fillColor: "#1a6b8a", weight: 1.5, opacity: 0.8, color: "#2a9bc0", fillOpacity: 0.2 },
@@ -21,13 +38,27 @@ const colors = {
   parishSelected: { fillColor: "#b060e0", weight: 2.5, fillOpacity: 0.5, color: "#d080ff" },
 };
 
-function FlyToBounds({ bounds }: { bounds: LatLngBoundsExpression | null }) {
+function FlyToBounds({
+  bounds,
+  onDone,
+}: {
+  bounds: LatLngBoundsExpression | null;
+  onDone?: () => void;
+}) {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
+      const handleMoveEnd = () => {
+        onDone?.();
+      };
+      map.once("moveend", handleMoveEnd);
       map.flyToBounds(bounds, { padding: [30, 30], duration: 0.8 });
+
+      return () => {
+        map.off("moveend", handleMoveEnd);
+      };
     }
-  }, [bounds, map]);
+  }, [bounds, map, onDone]);
   return null;
 }
 
@@ -44,8 +75,7 @@ const MapSimulationPage = () => {
   const [selectedMunicipality, setSelectedMunicipality] = useState<string | null>(null);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
 
-  const [muniData, setMuniData] = useState<GeoJSONData | null>(null);
-  const [parishData, setParishData] = useState<GeoJSONData | null>(null);
+  const [districtsData, setDistrictsData] = useState<GeoJSONData | null>(null);
   const [filteredMunis, setFilteredMunis] = useState<GeoJSONData | null>(null);
   const [filteredParishes, setFilteredParishes] = useState<GeoJSONData | null>(null);
 
@@ -54,63 +84,87 @@ const MapSimulationPage = () => {
 
   const [flyBounds, setFlyBounds] = useState<LatLngBoundsExpression | null>(null);
   const [defaultView, setDefaultView] = useState(true);
+  const [zoomTargetLevel, setZoomTargetLevel] = useState<"district" | "municipality" | "parish" | null>(null);
+  const [isDistrictZooming, setIsDistrictZooming] = useState(false);
+  const [isMunicipalityZooming, setIsMunicipalityZooming] = useState(false);
 
-  // Load municipality GeoJSON lazily
+  // Load districts from portugal_map hierarchy.
   useEffect(() => {
-    fetch("/portugal-municipalities.json")
+    fetch("/portugal_map/districts.json")
       .then((r) => r.json())
-      .then((data) => setMuniData(data))
+      .then((data) => setDistrictsData(data))
       .catch(console.error);
   }, []);
 
-  // Filter municipalities when district selected
+  // Load municipalities of selected district only.
   useEffect(() => {
-    if (!selectedDistrict || !muniData) {
+    if (!selectedDistrict) {
       setFilteredMunis(null);
       return;
     }
-    const districtUpper = selectedDistrict.toUpperCase();
-    const filtered: GeoJSONData = {
-      type: "FeatureCollection",
-      features: muniData.features.filter(
-        (f) => (f.properties?.district || "").toUpperCase() === districtUpper
-      ),
-    };
-    setFilteredMunis(filtered);
-  }, [selectedDistrict, muniData]);
+    let active = true;
+    const controller = new AbortController();
 
-  // Load and filter parishes when municipality selected
+    setLoadingMunis(true);
+    setFilteredMunis(null);
+    const districtSlug = slugifyPlaceName(selectedDistrict);
+    fetch(`/portugal_map/${districtSlug}/municipalities.json`, { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error("No district municipality file");
+        return r.json();
+      })
+      .then((data) => {
+        if (!active) return;
+        setFilteredMunis(data);
+        setLoadingMunis(false);
+      })
+      .catch((error) => {
+        if (!active || error?.name === "AbortError") return;
+        setFilteredMunis({ type: "FeatureCollection", features: [] });
+        setLoadingMunis(false);
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [selectedDistrict]);
+
+  // Load parishes of selected municipality only.
   useEffect(() => {
-    if (!selectedMunicipality) {
+    if (!selectedDistrict || !selectedMunicipality) {
       setFilteredParishes(null);
       return;
     }
+    let active = true;
+    const controller = new AbortController();
+
     setLoadingParishes(true);
+    setFilteredParishes(null);
 
-    const loadAndFilter = (data: GeoJSONData) => {
-      const muniUpper = selectedMunicipality.toUpperCase();
-      const filtered: GeoJSONData = {
-        type: "FeatureCollection",
-        features: data.features.filter(
-          (f) => (f.properties?.m || "").toUpperCase() === muniUpper
-        ),
-      };
-      setFilteredParishes(filtered);
-      setLoadingParishes(false);
+    const districtSlug = slugifyPlaceName(selectedDistrict);
+    const muniSlug = slugifyPlaceName(selectedMunicipality);
+    fetch(`/portugal_map/${districtSlug}/${muniSlug}/parishes.json`, { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error("No municipality parish file");
+        return r.json();
+      })
+      .then((data) => {
+        if (!active) return;
+        setFilteredParishes(data);
+        setLoadingParishes(false);
+      })
+      .catch((error) => {
+        if (!active || error?.name === "AbortError") return;
+        setFilteredParishes({ type: "FeatureCollection", features: [] });
+        setLoadingParishes(false);
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
     };
-
-    if (parishData) {
-      loadAndFilter(parishData);
-    } else {
-      fetch("/portugal-parishes.json")
-        .then((r) => r.json())
-        .then((data) => {
-          setParishData(data);
-          loadAndFilter(data);
-        })
-        .catch(() => setLoadingParishes(false));
-    }
-  }, [selectedMunicipality, parishData]);
+  }, [selectedDistrict, selectedMunicipality]);
 
   const estimate = selectedParish
     ? (() => {
@@ -146,7 +200,12 @@ const MapSimulationPage = () => {
           setSelectedParish(null);
           setDefaultView(false);
           const bounds = (layer as any).getBounds?.();
-          if (bounds) setFlyBounds(bounds);
+          if (bounds) {
+            setZoomTargetLevel("district");
+            setIsDistrictZooming(true);
+            setIsMunicipalityZooming(false);
+            setFlyBounds(bounds);
+          }
         },
       });
     },
@@ -177,7 +236,11 @@ const MapSimulationPage = () => {
           setSelectedMunicipality(name);
           setSelectedParish(null);
           const bounds = (layer as any).getBounds?.();
-          if (bounds) setFlyBounds(bounds);
+          if (bounds) {
+            setZoomTargetLevel("municipality");
+            setIsMunicipalityZooming(true);
+            setFlyBounds(bounds);
+          }
         },
       });
     },
@@ -207,7 +270,10 @@ const MapSimulationPage = () => {
         click: () => {
           setSelectedParish(name);
           const bounds = (layer as any).getBounds?.();
-          if (bounds) setFlyBounds(bounds);
+          if (bounds) {
+            setZoomTargetLevel("parish");
+            setFlyBounds(bounds);
+          }
         },
       });
     },
@@ -230,7 +296,20 @@ const MapSimulationPage = () => {
     setFilteredParishes(null);
     setFlyBounds(null);
     setDefaultView(true);
+    setZoomTargetLevel(null);
+    setIsDistrictZooming(false);
+    setIsMunicipalityZooming(false);
   };
+
+  const onFlyBoundsDone = useCallback(() => {
+    if (zoomTargetLevel === "district") {
+      setIsDistrictZooming(false);
+    }
+    if (zoomTargetLevel === "municipality") {
+      setIsMunicipalityZooming(false);
+    }
+    setZoomTargetLevel(null);
+  }, [zoomTargetLevel]);
 
   const goBackToDistrict = () => {
     setSelectedMunicipality(null);
@@ -317,17 +396,19 @@ const MapSimulationPage = () => {
                   />
 
                   {/* Districts layer - always visible */}
-                  <GeoJSON
-                    key={"districts-" + (selectedDistrict || "none")}
-                    data={districtsGeoJSON as any}
-                    style={styleDistrict}
-                    onEachFeature={onEachDistrict}
-                  />
+                  {districtsData && (
+                    <GeoJSON
+                      key={"districts-" + (selectedDistrict || "none")}
+                      data={districtsData as any}
+                      style={styleDistrict}
+                      onEachFeature={onEachDistrict}
+                    />
+                  )}
 
                   {/* Municipalities layer */}
-                  {filteredMunis && selectedDistrict && !selectedMunicipality && (
+                  {filteredMunis && selectedDistrict && !isDistrictZooming && (
                     <GeoJSON
-                      key={"munis-" + selectedDistrict}
+                      key={"munis-" + selectedDistrict + "-" + (selectedMunicipality || "none")}
                       data={filteredMunis as any}
                       style={styleMuni}
                       onEachFeature={onEachMuni}
@@ -335,7 +416,7 @@ const MapSimulationPage = () => {
                   )}
 
                   {/* Parishes layer */}
-                  {filteredParishes && selectedMunicipality && (
+                  {filteredParishes && selectedMunicipality && !isMunicipalityZooming && (
                     <GeoJSON
                       key={"parishes-" + selectedMunicipality + "-" + (selectedParish || "none")}
                       data={filteredParishes as any}
@@ -344,7 +425,7 @@ const MapSimulationPage = () => {
                     />
                   )}
 
-                  {flyBounds && <FlyToBounds bounds={flyBounds} />}
+                  {flyBounds && <FlyToBounds bounds={flyBounds} onDone={onFlyBoundsDone} />}
                   {defaultView && <FlyTo center={[39.6, -8.0]} zoom={7} />}
                 </MapContainer>
               </div>
