@@ -44,7 +44,7 @@ try {
       properties: {
         name: districtName,
       },
-      geometry: simplifyGeometry(feature.geometry, { tolerance: 0.00012, decimals: 6 }),
+      geometry: simplifyGeometry(feature.geometry, { tolerance: 0.009, decimals: 5 }),
     };
   });
 
