@@ -37,12 +37,6 @@ const Navbar = () => {
               {item.label}
             </Link>
           ))}
-          <Link
-            to="/simulation"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 glow-primary"
-          >
-            Run Simulation
-          </Link>
         </div>
 
         {/* Mobile toggle */}
