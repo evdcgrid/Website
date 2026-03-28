@@ -20,8 +20,8 @@ const Footer = () => (
             <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">Home</Link>
             <Link to="/simulation" className="text-sm text-muted-foreground hover:text-primary transition-colors">Simulation</Link>
             <Link to="/map" className="text-sm text-muted-foreground hover:text-primary transition-colors">Map Explorer</Link>
-            <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">Contact</Link>
             <Link to="/case-study" className="text-sm text-muted-foreground hover:text-primary transition-colors">Case Study</Link>
+            <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">Contact</Link>
           </div>
         </div>
         <div>
