@@ -1,100 +1,121 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { MapPin, Zap, Car, TrendingUp, ChevronRight, Loader2 } from "lucide-react";
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
-import type { Layer, LeafletMouseEvent } from "leaflet";
+import type { Layer, LeafletMouseEvent, LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import districtsGeoJSON from "@/assets/portugal-districts.json";
 
-const API_BASE = "https://json.geoapi.pt";
+type GeoJSONData = GeoJSON.FeatureCollection;
 
-const defaultStyle = {
-  fillColor: "hsl(200, 80%, 35%)",
-  weight: 1.5,
-  opacity: 0.8,
-  color: "hsl(200, 80%, 50%)",
-  fillOpacity: 0.25,
+const colors = {
+  default: { fillColor: "#1a6b8a", weight: 1.5, opacity: 0.8, color: "#2a9bc0", fillOpacity: 0.2 },
+  hover: { fillColor: "#2dba6e", weight: 2, fillOpacity: 0.35, color: "#3de88a" },
+  selected: { fillColor: "#2dba6e", weight: 2.5, fillOpacity: 0.45, color: "#4af59a" },
+  muni: { fillColor: "#c47a20", weight: 1, opacity: 0.8, color: "#e8a030", fillOpacity: 0.2 },
+  muniHover: { fillColor: "#e8a030", weight: 2, fillOpacity: 0.35, color: "#f0c060" },
+  muniSelected: { fillColor: "#e8a030", weight: 2.5, fillOpacity: 0.45, color: "#f0c060" },
+  parish: { fillColor: "#8a3ac0", weight: 1, opacity: 0.8, color: "#b060e0", fillOpacity: 0.2 },
+  parishHover: { fillColor: "#b060e0", weight: 2, fillOpacity: 0.35, color: "#d080ff" },
+  parishSelected: { fillColor: "#b060e0", weight: 2.5, fillOpacity: 0.5, color: "#d080ff" },
 };
 
-const hoverStyle = {
-  fillColor: "hsl(150, 80%, 45%)",
-  weight: 2,
-  fillOpacity: 0.4,
-  color: "hsl(150, 80%, 55%)",
-};
-
-const selectedStyle = {
-  fillColor: "hsl(150, 80%, 45%)",
-  weight: 2.5,
-  fillOpacity: 0.5,
-  color: "hsl(150, 80%, 60%)",
-};
+function FlyToBounds({ bounds }: { bounds: LatLngBoundsExpression | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (bounds) {
+      map.flyToBounds(bounds, { padding: [30, 30], duration: 0.8 });
+    }
+  }, [bounds, map]);
+  return null;
+}
 
 function FlyTo({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(center, zoom, { duration: 1 });
+    map.flyTo(center, zoom, { duration: 0.8 });
   }, [center, zoom, map]);
   return null;
 }
 
 const MapSimulationPage = () => {
-  const [municipalities, setMunicipalities] = useState<string[]>([]);
-  const [parishes, setParishes] = useState<string[]>([]);
-
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   const [selectedMunicipality, setSelectedMunicipality] = useState<string | null>(null);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
 
-  const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
+  const [muniData, setMuniData] = useState<GeoJSONData | null>(null);
+  const [parishData, setParishData] = useState<GeoJSONData | null>(null);
+  const [filteredMunis, setFilteredMunis] = useState<GeoJSONData | null>(null);
+  const [filteredParishes, setFilteredParishes] = useState<GeoJSONData | null>(null);
+
+  const [loadingMunis, setLoadingMunis] = useState(false);
   const [loadingParishes, setLoadingParishes] = useState(false);
 
-  const [mapCenter, setMapCenter] = useState<[number, number]>([39.5, -8.0]);
-  const [mapZoom, setMapZoom] = useState(7);
+  const [flyBounds, setFlyBounds] = useState<LatLngBoundsExpression | null>(null);
+  const [defaultView, setDefaultView] = useState(true);
 
-  // Fetch municipalities when district changes
+  // Load municipality GeoJSON lazily
   useEffect(() => {
-    if (!selectedDistrict) {
-      setMunicipalities([]);
+    fetch("/portugal-municipalities.json")
+      .then((r) => r.json())
+      .then((data) => setMuniData(data))
+      .catch(console.error);
+  }, []);
+
+  // Filter municipalities when district selected
+  useEffect(() => {
+    if (!selectedDistrict || !muniData) {
+      setFilteredMunis(null);
       return;
     }
-    setLoadingMunicipalities(true);
-    setSelectedMunicipality(null);
-    setSelectedParish(null);
-    setParishes([]);
-    fetch(`${API_BASE}/distrito/${encodeURIComponent(selectedDistrict)}/municipios`)
-      .then((r) => r.json())
-      .then((data) => {
-        setMunicipalities(
-          (data.municipios as { nome: string }[]).map((m) => m.nome).sort()
-        );
-      })
-      .catch(() => setMunicipalities([]))
-      .finally(() => setLoadingMunicipalities(false));
-  }, [selectedDistrict]);
+    const districtUpper = selectedDistrict.toUpperCase();
+    const filtered: GeoJSONData = {
+      type: "FeatureCollection",
+      features: muniData.features.filter(
+        (f) => (f.properties?.district || "").toUpperCase() === districtUpper
+      ),
+    };
+    setFilteredMunis(filtered);
+  }, [selectedDistrict, muniData]);
 
-  // Fetch parishes when municipality changes
+  // Load and filter parishes when municipality selected
   useEffect(() => {
     if (!selectedMunicipality) {
-      setParishes([]);
+      setFilteredParishes(null);
       return;
     }
     setLoadingParishes(true);
-    setSelectedParish(null);
-    fetch(`${API_BASE}/municipio/${encodeURIComponent(selectedMunicipality)}/freguesias`)
-      .then((r) => r.json())
-      .then((data) => {
-        setParishes((data.freguesias as string[]).sort());
-      })
-      .catch(() => setParishes([]))
-      .finally(() => setLoadingParishes(false));
-  }, [selectedMunicipality]);
+
+    const loadAndFilter = (data: GeoJSONData) => {
+      const muniUpper = selectedMunicipality.toUpperCase();
+      const filtered: GeoJSONData = {
+        type: "FeatureCollection",
+        features: data.features.filter(
+          (f) => (f.properties?.m || "").toUpperCase() === muniUpper
+        ),
+      };
+      setFilteredParishes(filtered);
+      setLoadingParishes(false);
+    };
+
+    if (parishData) {
+      loadAndFilter(parishData);
+    } else {
+      fetch("/portugal-parishes.json")
+        .then((r) => r.json())
+        .then((data) => {
+          setParishData(data);
+          loadAndFilter(data);
+        })
+        .catch(() => setLoadingParishes(false));
+    }
+  }, [selectedMunicipality, parishData]);
 
   const estimate = selectedParish
     ? (() => {
         const hash = selectedParish.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-        const lightingPoints = 200 + (hash * 37) % 5000;
+        const lightingPoints = 200 + ((hash * 37) % 5000);
         const evCapacity = Math.floor(lightingPoints * 0.05);
         return {
           lightingPoints,
@@ -107,49 +128,126 @@ const MapSimulationPage = () => {
       })()
     : null;
 
-  const onEachFeature = useMemo(() => {
-    return (feature: GeoJSON.Feature, layer: Layer) => {
+  // District layer handlers
+  const onEachDistrict = useCallback(
+    (feature: GeoJSON.Feature, layer: Layer) => {
       const name = feature.properties?.name;
-      layer.bindTooltip(name, { sticky: true, className: "district-tooltip" });
+      layer.bindTooltip(name, { sticky: true, className: "map-tooltip" });
       layer.on({
         mouseover: (e: LeafletMouseEvent) => {
-          if (selectedDistrict !== name) {
-            e.target.setStyle(hoverStyle);
-          }
+          if (selectedDistrict !== name) e.target.setStyle(colors.hover);
         },
         mouseout: (e: LeafletMouseEvent) => {
-          if (selectedDistrict !== name) {
-            e.target.setStyle(defaultStyle);
-          }
+          if (selectedDistrict !== name) e.target.setStyle(colors.default);
         },
         click: () => {
           setSelectedDistrict(name);
-          // Compute center of district from bounds
+          setSelectedMunicipality(null);
+          setSelectedParish(null);
+          setDefaultView(false);
           const bounds = (layer as any).getBounds?.();
-          if (bounds) {
-            const center = bounds.getCenter();
-            setMapCenter([center.lat, center.lng]);
-            setMapZoom(9);
-          }
+          if (bounds) setFlyBounds(bounds);
         },
       });
-    };
-  }, [selectedDistrict]);
+    },
+    [selectedDistrict]
+  );
 
-  const styleFeature = useMemo(() => {
-    return (feature: any) => {
-      if (feature?.properties?.name === selectedDistrict) return selectedStyle;
-      return defaultStyle;
-    };
-  }, [selectedDistrict]);
+  const styleDistrict = useCallback(
+    (feature: any) => {
+      if (feature?.properties?.name === selectedDistrict) return colors.selected;
+      return colors.default;
+    },
+    [selectedDistrict]
+  );
+
+  // Municipality layer handlers
+  const onEachMuni = useCallback(
+    (feature: GeoJSON.Feature, layer: Layer) => {
+      const name = feature.properties?.name;
+      layer.bindTooltip(name, { sticky: true, className: "map-tooltip" });
+      layer.on({
+        mouseover: (e: LeafletMouseEvent) => {
+          if (selectedMunicipality !== name) e.target.setStyle(colors.muniHover);
+        },
+        mouseout: (e: LeafletMouseEvent) => {
+          if (selectedMunicipality !== name) e.target.setStyle(colors.muni);
+        },
+        click: () => {
+          setSelectedMunicipality(name);
+          setSelectedParish(null);
+          const bounds = (layer as any).getBounds?.();
+          if (bounds) setFlyBounds(bounds);
+        },
+      });
+    },
+    [selectedMunicipality]
+  );
+
+  const styleMuni = useCallback(
+    (feature: any) => {
+      if (feature?.properties?.name === selectedMunicipality) return colors.muniSelected;
+      return colors.muni;
+    },
+    [selectedMunicipality]
+  );
+
+  // Parish layer handlers
+  const onEachParish = useCallback(
+    (feature: GeoJSON.Feature, layer: Layer) => {
+      const name = feature.properties?.n;
+      layer.bindTooltip(name, { sticky: true, className: "map-tooltip" });
+      layer.on({
+        mouseover: (e: LeafletMouseEvent) => {
+          if (selectedParish !== name) e.target.setStyle(colors.parishHover);
+        },
+        mouseout: (e: LeafletMouseEvent) => {
+          if (selectedParish !== name) e.target.setStyle(colors.parish);
+        },
+        click: () => {
+          setSelectedParish(name);
+          const bounds = (layer as any).getBounds?.();
+          if (bounds) setFlyBounds(bounds);
+        },
+      });
+    },
+    [selectedParish]
+  );
+
+  const styleParish = useCallback(
+    (feature: any) => {
+      if (feature?.properties?.n === selectedParish) return colors.parishSelected;
+      return colors.parish;
+    },
+    [selectedParish]
+  );
 
   const resetSelection = () => {
     setSelectedDistrict(null);
     setSelectedMunicipality(null);
     setSelectedParish(null);
-    setMapCenter([39.5, -8.0]);
-    setMapZoom(7);
+    setFilteredMunis(null);
+    setFilteredParishes(null);
+    setFlyBounds(null);
+    setDefaultView(true);
   };
+
+  const goBackToDistrict = () => {
+    setSelectedMunicipality(null);
+    setSelectedParish(null);
+    setFilteredParishes(null);
+    // Re-zoom to district
+    if (selectedDistrict && filteredMunis) {
+      // Will re-fly via district selection
+      setSelectedDistrict((prev) => {
+        // Trigger re-render
+        return prev;
+      });
+    }
+  };
+
+  // Determine what to show in the status area
+  const currentStep = !selectedDistrict ? "district" : !selectedMunicipality ? "municipality" : !selectedParish ? "parish" : "result";
 
   return (
     <div className="min-h-screen">
@@ -162,48 +260,53 @@ const MapSimulationPage = () => {
               Explore <span className="gradient-text">Portugal</span>
             </h1>
             <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-              Click on a district in the map, then select concelho and freguesia.
+              Navigate the map to select a district, municipality, and parish.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Map + selectors */}
+            {/* Map + info */}
             <div className="lg:col-span-1 space-y-4">
               {/* Breadcrumb */}
-              {selectedDistrict && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap">
-                  <button onClick={resetSelection} className="hover:text-primary transition-colors">
-                    Portugal
-                  </button>
-                  <ChevronRight size={12} />
-                  <button
-                    onClick={() => { setSelectedMunicipality(null); setSelectedParish(null); }}
-                    className="hover:text-primary transition-colors"
-                  >
-                    {selectedDistrict}
-                  </button>
-                  {selectedMunicipality && (
-                    <>
-                      <ChevronRight size={12} />
-                      <button onClick={() => setSelectedParish(null)} className="hover:text-primary transition-colors">
-                        {selectedMunicipality}
-                      </button>
-                    </>
-                  )}
-                  {selectedParish && (
-                    <>
-                      <ChevronRight size={12} />
-                      <span className="text-primary font-medium">{selectedParish}</span>
-                    </>
-                  )}
-                </div>
-              )}
+              <div className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap min-h-[1.5rem]">
+                <button onClick={resetSelection} className="hover:text-primary transition-colors font-medium">
+                  Portugal
+                </button>
+                {selectedDistrict && (
+                  <>
+                    <ChevronRight size={12} />
+                    <button
+                      onClick={() => { setSelectedMunicipality(null); setSelectedParish(null); setFilteredParishes(null); }}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {selectedDistrict}
+                    </button>
+                  </>
+                )}
+                {selectedMunicipality && (
+                  <>
+                    <ChevronRight size={12} />
+                    <button
+                      onClick={() => { setSelectedParish(null); }}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {selectedMunicipality}
+                    </button>
+                  </>
+                )}
+                {selectedParish && (
+                  <>
+                    <ChevronRight size={12} />
+                    <span className="text-primary font-medium">{selectedParish}</span>
+                  </>
+                )}
+              </div>
 
               {/* Map */}
-              <div className="rounded-lg border border-border overflow-hidden h-[360px]">
+              <div className="rounded-lg border border-border overflow-hidden h-[420px]">
                 <MapContainer
-                  center={mapCenter}
-                  zoom={mapZoom}
+                  center={[39.6, -8.0]}
+                  zoom={7}
                   className="h-full w-full"
                   zoomControl={false}
                   style={{ background: "hsl(222, 47%, 8%)" }}
@@ -212,74 +315,87 @@ const MapSimulationPage = () => {
                     attribution='&copy; <a href="https://carto.com/">CARTO</a>'
                     url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                   />
+
+                  {/* Districts layer - always visible */}
                   <GeoJSON
-                    key={selectedDistrict || "all"}
+                    key={"districts-" + (selectedDistrict || "none")}
                     data={districtsGeoJSON as any}
-                    style={styleFeature}
-                    onEachFeature={onEachFeature}
+                    style={styleDistrict}
+                    onEachFeature={onEachDistrict}
                   />
-                  <FlyTo center={mapCenter} zoom={mapZoom} />
+
+                  {/* Municipalities layer */}
+                  {filteredMunis && selectedDistrict && !selectedMunicipality && (
+                    <GeoJSON
+                      key={"munis-" + selectedDistrict}
+                      data={filteredMunis as any}
+                      style={styleMuni}
+                      onEachFeature={onEachMuni}
+                    />
+                  )}
+
+                  {/* Parishes layer */}
+                  {filteredParishes && selectedMunicipality && (
+                    <GeoJSON
+                      key={"parishes-" + selectedMunicipality + "-" + (selectedParish || "none")}
+                      data={filteredParishes as any}
+                      style={styleParish}
+                      onEachFeature={onEachParish}
+                    />
+                  )}
+
+                  {flyBounds && <FlyToBounds bounds={flyBounds} />}
+                  {defaultView && <FlyTo center={[39.6, -8.0]} zoom={7} />}
                 </MapContainer>
               </div>
 
-              {/* Dropdowns */}
-              {selectedDistrict && (
-                <div className="rounded-lg border border-border bg-card p-5 space-y-4">
-                  {/* Municipality select */}
-                  <div>
-                    <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
-                      Concelho
-                    </label>
-                    {loadingMunicipalities ? (
-                      <div className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" /> A carregar...
+              {/* Status */}
+              <div className="rounded-lg border border-border bg-card p-4">
+                {currentStep === "district" && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    👆 Clica num <span className="text-primary font-medium">distrito</span> no mapa
+                  </p>
+                )}
+                {currentStep === "municipality" && (
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Distrito: <span className="text-primary font-medium">{selectedDistrict}</span>
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      👆 Agora clica num <span className="text-[hsl(35,80%,50%)] font-medium">concelho</span>
+                    </p>
+                    {loadingMunis && (
+                      <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
+                        <Loader2 className="h-3 w-3 animate-spin" /> A carregar concelhos...
                       </div>
-                    ) : (
-                      <select
-                        value={selectedMunicipality || ""}
-                        onChange={(e) => setSelectedMunicipality(e.target.value || null)}
-                        className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                      >
-                        <option value="">Selecionar concelho...</option>
-                        {municipalities.map((m) => (
-                          <option key={m} value={m}>{m}</option>
-                        ))}
-                      </select>
                     )}
                   </div>
-
-                  {/* Parish select */}
-                  {selectedMunicipality && (
-                    <div>
-                      <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
-                        Freguesia
-                      </label>
-                      {loadingParishes ? (
-                        <div className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
-                          <Loader2 className="h-4 w-4 animate-spin" /> A carregar...
-                        </div>
-                      ) : (
-                        <select
-                          value={selectedParish || ""}
-                          onChange={(e) => setSelectedParish(e.target.value || null)}
-                          className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                        >
-                          <option value="">Selecionar freguesia...</option>
-                          {parishes.map((p) => (
-                            <option key={p} value={p}>{p}</option>
-                          ))}
-                        </select>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {!selectedDistrict && (
-                <p className="text-xs text-muted-foreground text-center">
-                  Clica num distrito no mapa para começar
-                </p>
-              )}
+                )}
+                {currentStep === "parish" && (
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {selectedDistrict} → <span className="text-[hsl(35,80%,50%)] font-medium">{selectedMunicipality}</span>
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      👆 Agora clica numa <span className="text-[hsl(270,60%,65%)] font-medium">freguesia</span>
+                    </p>
+                    {loadingParishes && (
+                      <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
+                        <Loader2 className="h-3 w-3 animate-spin" /> A carregar freguesias...
+                      </div>
+                    )}
+                  </div>
+                )}
+                {currentStep === "result" && (
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-primary">{selectedParish}</p>
+                    <p className="text-xs text-muted-foreground">{selectedMunicipality}, {selectedDistrict}</p>
+                    <button onClick={resetSelection} className="mt-2 text-xs text-primary hover:underline">
+                      Nova pesquisa
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Results dashboard */}
@@ -323,11 +439,9 @@ const MapSimulationPage = () => {
                   <div className="text-center">
                     <MapPin className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                     <p className="text-muted-foreground">
-                      {!selectedDistrict
-                        ? "Seleciona um distrito no mapa"
-                        : !selectedMunicipality
-                        ? "Seleciona um concelho"
-                        : "Seleciona uma freguesia para ver estimativas"}
+                      {currentStep === "district" && "Seleciona um distrito no mapa"}
+                      {currentStep === "municipality" && "Seleciona um concelho no mapa"}
+                      {currentStep === "parish" && "Seleciona uma freguesia no mapa"}
                     </p>
                   </div>
                 </div>
