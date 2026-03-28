@@ -3,11 +3,11 @@ import Footer from "@/components/Footer";
 import { TrendingDown, Zap, Cable, Wrench, MapPin, ArrowRight, CheckCircle2 } from "lucide-react";
 
 const acExcavation = [
-  { item: "Escavação Mecânica", range: "25€ - 40€/m³", value: 25 },
-  { item: "Abertura e Fecho de Vala (Ambiente Urbano)", range: "80€ - 120€", value: 80 },
-  { item: "Cablagem e Tubagem", range: "20€ - 30€", value: 20 },
-  { item: "Mão de Obra e Licenciamento", range: "150€ - 200€/m", value: 150 },
-  { item: "Distância", range: "400 - 800m", value: 400 },
+  { item: "Escavação Mecânica", range: "25€ - 40€/m³", value: "25€/m³" },
+  { item: "Abertura e Fecho de Vala (Ambiente Urbano)", range: "80€ - 120€", value: "80€" },
+  { item: "Cablagem e Tubagem", range: "20€ - 30€", value: "20€" },
+  { item: "Mão de Obra e Licenciamento", range: "150€ - 200€/m", value: "150€/m" },
+  { item: "Distância", range: "400 - 800m", value: "400m" },
 ];
 
 const acObras = [
@@ -42,11 +42,11 @@ const CaseStudyPage = () => {
         <div className="section-container relative z-10">
           <div className="flex items-center gap-2 text-primary mb-4">
             <MapPin size={18} />
-            <span className="text-sm font-mono font-semibold tracking-wider uppercase">Barreiro, Portugal</span>
+            <span className="text-sm font-mono font-semibold tracking-wider uppercase">Areeiro, Lisboa</span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black mb-4 leading-tight">
             Caso de Estudo:<br />
-            <span className="text-primary">Bairro no Barreiro</span>
+            <span className="text-primary">Bairro no Areeiro</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl">
             Análise comparativa de custos entre infraestrutura de iluminação pública tradicional (AC) e o sistema DC Grid, demonstrando poupanças significativas em obra civil e instalação.
@@ -78,7 +78,7 @@ const CaseStudyPage = () => {
             <div className="relative z-10">
               <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider mb-2">Poupança</p>
               <p className="text-3xl font-heading font-black text-accent">
-                {savingsPercent.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
+                {savingsPercent.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %
               </p>
               <p className="text-xs text-muted-foreground mt-1">{fmt(totalAC - totalDC)} € de poupança</p>
             </div>
@@ -113,7 +113,7 @@ const CaseStudyPage = () => {
                       <p className="text-foreground font-medium">{row.item}</p>
                       <p className="text-xs text-muted-foreground">{row.range}</p>
                     </div>
-                    <span className="font-mono font-semibold text-foreground">{fmt(row.value)}</span>
+                    <span className="font-mono font-semibold text-foreground">{row.value}</span>
                   </div>
                 ))}
                 <div className="flex items-center justify-between px-5 py-3 bg-secondary/20">
@@ -202,7 +202,7 @@ const CaseStudyPage = () => {
                 <div className="flex items-center gap-1 text-accent">
                   <TrendingDown size={16} />
                   <span className="font-mono font-bold">
-                    {savingsPercent.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
+                    {savingsPercent.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %
                   </span>
                 </div>
               </div>
