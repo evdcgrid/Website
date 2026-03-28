@@ -25,7 +25,7 @@ const HeroSection = () => (
         </h1>
 
         <p className="animate-fade-up-delay-2 mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-          Transforming existing AC public lighting grids into high-capacity DC infrastructure for EV charging — no cable replacement needed.
+          Transforming existing AC public lighting grids into high-capacity DC infrastructure for EV charging.
         </p>
 
         <div className="animate-fade-up-delay-3 mt-10 flex flex-wrap gap-4">
