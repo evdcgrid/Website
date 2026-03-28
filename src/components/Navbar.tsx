@@ -5,6 +5,7 @@ import logo from "@/assets/evdcgrid-logo.svg";
 
 const navItems = [
   { label: "Home", path: "/" },
+  { label: "Product", path: "/product" },
   { label: "Simulation", path: "/simulation" },
   { label: "Map Explorer", path: "/map" },
   { label: "Contact", path: "/contact" },
