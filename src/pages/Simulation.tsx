@@ -24,22 +24,35 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Info, Calculator } from "lucide-react";
+import { Info, Calculator, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const LUMINAIRE_TYPES = [
-  { value: "led", label: "LED", power: 100 },
-  { value: "mercury", label: "Mercury", power: 250 },
-  { value: "sodium", label: "Sodium", power: 150 },
-  { value: "others", label: "Others", power: 200 },
+  { value: "LED", label: "LED" },
+  { value: "Mercury", label: "Mercury" },
+  { value: "Sodium", label: "Sodium" },
+  { value: "Others", label: "Others" },
 ];
 
+interface ScenarioData {
+  total_energy: number;
+  n_chargers: number;
+  lights_power: number;
+  cost: number;
+  savings: number;
+  reused_infra_pct: number;
+}
+
+interface ApiResponse {
+  now: ScenarioData;
+  ac: ScenarioData;
+  dc: ScenarioData;
+}
+
 interface Results {
-  numChargers: { current: number; dc: number; ac: number };
-  powerConsumption: { current: string; dc: string; ac: string };
-  savingsLighting: { current: string; dc: string; ac: string };
-  infraCost: { current: string; dc: string; ac: string };
-  energyTransported: { current: string; dc: string; ac: string };
-  infraReuse: { current: string; dc: string; ac: string };
+  now: ScenarioData;
+  ac: ScenarioData;
+  dc: ScenarioData;
 }
 
 const MetricTooltip = ({ text }: { text: string }) => (
@@ -53,12 +66,21 @@ const MetricTooltip = ({ text }: { text: string }) => (
   </Tooltip>
 );
 
+const formatEuro = (value: number): string => {
+  return value.toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }) + " €";
+};
+
 const SimulationPage = () => {
   const [distance, setDistance] = useState("");
   const [numLuminaires, setNumLuminaires] = useState("");
   const [luminaireType, setLuminaireType] = useState("");
   const [results, setResults] = useState<Results | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -75,80 +97,56 @@ const SimulationPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const calculate = () => {
+  const calculate = async () => {
     if (!validate()) return;
 
-    const dist = Number(distance);
-    const num = Number(numLuminaires);
-    const lum = LUMINAIRE_TYPES.find((l) => l.value === luminaireType)!;
-    const power = lum.power;
+    setLoading(true);
+    setResults(null);
 
-    // Total lighting power
-    const totalLightingKW = (num * power) / 1000;
+    try {
+      const response = await fetch(
+        "https://diogo-guerreiro.app.n8n.cloud/webhook/evdc-grid-simulation",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            n_luminarias: Number(numLuminaires),
+            distancia: Number(distance),
+            tipo_luminarias: luminaireType,
+          }),
+        }
+      );
 
-    // Current case – AC only, no chargers
-    const currentInfraCost = dist * 85 + num * 120;
-    const currentEnergy = totalLightingKW * 0.92; // 8% losses AC
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
 
-    // DC installation – reuses cables, adds chargers
-    const dcCapacityFactor = 2.8;
-    const dcAvailableKW = totalLightingKW * dcCapacityFactor;
-    const dcChargersMax = Math.floor((dcAvailableKW - totalLightingKW) / 22);
-    const dcChargers = Math.max(dcChargersMax, 0);
-    const dcLightingPower = totalLightingKW * 0.95; // 5% DC-DC losses
-    const dcSavings = (totalLightingKW - dcLightingPower) * 8760 * 0.15; // yearly €
-    const dcInfraCost = dist * 12 + dcChargers * 2500 + 8000; // converter + charger stations
-    const dcEnergy = dcAvailableKW * 0.97; // 3% losses
+      const data: ApiResponse[] = await response.json();
+      const result = data[0];
 
-    // AC installation – new parallel AC grid for chargers
-    const acChargers = dcChargers > 0 ? dcChargers : 1;
-    const acInfraCost = dist * 85 + acChargers * 8000 + num * 120 + 25000; // new trench + transformers
-    const acEnergy = totalLightingKW * 0.92 + acChargers * 22 * 0.90;
-    const acSavings = 0;
-
-    const infraReuseDC = Math.round(((currentInfraCost - dcInfraCost) / currentInfraCost) * 100);
-
-    setResults({
-      numChargers: {
-        current: 0,
-        dc: dcChargers,
-        ac: acChargers,
-      },
-      powerConsumption: {
-        current: `${totalLightingKW.toFixed(1)} kW`,
-        dc: `${dcLightingPower.toFixed(1)} kW`,
-        ac: `${totalLightingKW.toFixed(1)} kW`,
-      },
-      savingsLighting: {
-        current: "€0",
-        dc: `€${Math.round(dcSavings).toLocaleString()}`,
-        ac: `€${Math.round(acSavings).toLocaleString()}`,
-      },
-      infraCost: {
-        current: `€${Math.round(currentInfraCost).toLocaleString()}`,
-        dc: `€${Math.round(dcInfraCost).toLocaleString()}`,
-        ac: `€${Math.round(acInfraCost).toLocaleString()}`,
-      },
-      energyTransported: {
-        current: `${currentEnergy.toFixed(1)} kW`,
-        dc: `${dcEnergy.toFixed(1)} kW`,
-        ac: `${acEnergy.toFixed(1)} kW`,
-      },
-      infraReuse: {
-        current: "—",
-        dc: `${Math.max(infraReuseDC, 0)}%`,
-        ac: "0%",
-      },
-    });
+      setResults({
+        now: result.now,
+        ac: result.ac,
+        dc: result.dc,
+      });
+    } catch (error) {
+      toast({
+        title: "Calculation failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const metrics: { key: keyof Results; label: string; tooltip: string }[] = [
-    { key: "numChargers", label: "Number of Chargers", tooltip: "EV chargers supported by each scenario (22 kW each)" },
-    { key: "powerConsumption", label: "Power Consumption (Lighting)", tooltip: "Total power consumed by the lighting system" },
-    { key: "savingsLighting", label: "Savings in Euros (Lighting)", tooltip: "Yearly savings from reduced lighting losses" },
-    { key: "infraCost", label: "Infrastructure Cost", tooltip: "Estimated total cost including cables, converters and chargers" },
-    { key: "energyTransported", label: "Energy Transported", tooltip: "Effective energy delivered accounting for line losses" },
-    { key: "infraReuse", label: "Infrastructure Reuse", tooltip: "Percentage of existing infrastructure reused vs current case" },
+  const metrics: { key: keyof ScenarioData; label: string; tooltip: string; format: (v: number) => string }[] = [
+    { key: "n_chargers", label: "Number of Chargers", tooltip: "EV chargers supported by each scenario (22 kW each)", format: (v) => String(v) },
+    { key: "lights_power", label: "Power Consumption (Lighting)", tooltip: "Total power consumed by the lighting system", format: (v) => `${v.toFixed(1)} kW` },
+    { key: "savings", label: "Savings in Euros (Lighting)", tooltip: "Yearly savings from reduced lighting losses", format: formatEuro },
+    { key: "cost", label: "Infrastructure Cost", tooltip: "Estimated total cost including cables, converters and chargers", format: formatEuro },
+    { key: "total_energy", label: "Energy Transported", tooltip: "Effective energy delivered accounting for line losses", format: (v) => `${v.toFixed(1)} kW` },
+    { key: "reused_infra_pct", label: "Infrastructure Reuse", tooltip: "Percentage of existing infrastructure reused vs current case", format: (v) => `${v}%` },
   ];
 
   return (
@@ -174,7 +172,6 @@ const SimulationPage = () => {
           <div className="rounded-lg border border-border bg-card p-6 sm:p-8 mb-8">
             <h3 className="font-heading font-bold text-lg mb-6">Grid Parameters</h3>
             <div className="grid sm:grid-cols-3 gap-6">
-              {/* Distance */}
               <div className="space-y-2">
                 <Label htmlFor="distance">Distance of the line (m)</Label>
                 <Input
@@ -191,7 +188,6 @@ const SimulationPage = () => {
                 )}
               </div>
 
-              {/* Num Luminaires */}
               <div className="space-y-2">
                 <Label htmlFor="numLuminaires">Number of luminaires</Label>
                 <Input
@@ -208,7 +204,6 @@ const SimulationPage = () => {
                 )}
               </div>
 
-              {/* Luminaire Type */}
               <div className="space-y-2">
                 <Label>Type of luminaire</Label>
                 <Select value={luminaireType} onValueChange={setLuminaireType}>
@@ -230,9 +225,9 @@ const SimulationPage = () => {
             </div>
 
             <div className="mt-6 flex justify-end">
-              <Button onClick={calculate} size="lg" className="gap-2">
-                <Calculator className="h-4 w-4" />
-                Calculate
+              <Button onClick={calculate} size="lg" className="gap-2" disabled={loading}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Calculator className="h-4 w-4" />}
+                {loading ? "Calculating..." : "Calculate"}
               </Button>
             </div>
           </div>
@@ -253,26 +248,23 @@ const SimulationPage = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {metrics.map((m) => {
-                    const row = results[m.key];
-                    return (
-                      <TableRow key={m.key}>
-                        <TableCell className="font-medium">
-                          {m.label}
-                          <MetricTooltip text={m.tooltip} />
-                        </TableCell>
-                        <TableCell className="text-center font-mono text-sm">
-                          {typeof row.current === "number" ? row.current : row.current}
-                        </TableCell>
-                        <TableCell className="text-center font-mono text-sm text-primary font-semibold">
-                          {typeof row.dc === "number" ? row.dc : row.dc}
-                        </TableCell>
-                        <TableCell className="text-center font-mono text-sm">
-                          {typeof row.ac === "number" ? row.ac : row.ac}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {metrics.map((m) => (
+                    <TableRow key={m.key}>
+                      <TableCell className="font-medium">
+                        {m.label}
+                        <MetricTooltip text={m.tooltip} />
+                      </TableCell>
+                      <TableCell className="text-center font-mono text-sm">
+                        {m.format(results.now[m.key])}
+                      </TableCell>
+                      <TableCell className="text-center font-mono text-sm text-primary font-semibold">
+                        {m.format(results.dc[m.key])}
+                      </TableCell>
+                      <TableCell className="text-center font-mono text-sm">
+                        {m.format(results.ac[m.key])}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>
