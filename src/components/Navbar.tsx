@@ -6,8 +6,7 @@ import logo from "@/assets/logo_c_white.svg";
 const navItems = [
   { label: "Home", path: "/" },
   { label: "Product", path: "/product" },
-  { label: "Simulation", path: "/simulation" },
-  { label: "Map Explorer", path: "/map" },
+  { label: "Caso de Estudo", path: "/case-study" },
   { label: "Contact", path: "/contact" },
 ];
 
