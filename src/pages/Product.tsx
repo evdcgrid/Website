@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import rackImage from "@/assets/rack01-product.jpg";
 import Footer from "@/components/Footer";
 import { Cpu, Shield, Zap, Radio, Globe, Gauge, BatteryCharging, CircuitBoard } from "lucide-react";
 import {
@@ -45,6 +46,16 @@ const ProductPage = () => (
         <p className="text-muted-foreground mt-6 max-w-2xl mx-auto text-lg">
           A modular, intelligent power conversion rack that transforms any public lighting grid into a high-capacity DC network for EV charging.
         </p>
+      </div>
+      {/* Product image */}
+      <div className="mt-12 max-w-2xl mx-auto">
+        <div className="rounded-xl border border-border bg-card p-4 glow-primary">
+          <img
+            src={rackImage}
+            alt="RACK01 / MasterGrid01 — Modular power conversion rack"
+            className="w-full rounded-lg"
+          />
+        </div>
       </div>
     </section>
 
