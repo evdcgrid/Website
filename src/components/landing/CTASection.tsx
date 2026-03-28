@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, Mail, MapPin } from "lucide-react";
 
 const CTASection = () => (
   <section className="py-24 relative overflow-hidden">
@@ -26,6 +26,13 @@ const CTASection = () => (
           >
             <Mail size={16} />
             Contact Us
+          </Link>
+          <Link
+            to="/map"
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-6 py-3 text-sm font-semibold text-secondary-foreground transition-all hover:bg-secondary/80"
+          >
+            <MapPin size={16} />
+            Map Explorer
           </Link>
         </div>
       </div>
