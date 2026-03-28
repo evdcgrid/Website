@@ -563,7 +563,7 @@ const MapSimulationPage = () => {
                       </div>
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs text-muted-foreground mb-1">Percentage of LEDs</div>
-                        <div className="text-2xl font-heading font-black">{freguesiaData.led.led_percentage}%</div>
+                        <div className="text-2xl font-heading font-black">{freguesiaData.led.led_percentage}</div>
                       </div>
                     </div>
                   </div>
@@ -597,11 +597,11 @@ const MapSimulationPage = () => {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs text-muted-foreground mb-1">Current AC Power Available</div>
-                        <div className="text-2xl font-heading font-black">{freguesiaData.dc.ac_power.toLocaleString("de-DE")} kW</div>
+                        <div className="text-2xl font-heading font-black">{Math.round(freguesiaData.dc.ac_power).toLocaleString("de-DE")} kW</div>
                       </div>
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs text-muted-foreground mb-1">Additional DC Power Capacity</div>
-                        <div className="text-2xl font-heading font-black text-primary">{freguesiaData.dc.dc_power.toLocaleString("de-DE")} kW</div>
+                        <div className="text-2xl font-heading font-black text-primary">{Math.round(freguesiaData.dc.dc_power).toLocaleString("de-DE")} kW</div>
                       </div>
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs text-muted-foreground mb-1">Number of Racks Required</div>
