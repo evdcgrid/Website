@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { MapPin, Zap, Car, TrendingUp, ChevronRight, Loader2 } from "lucide-react";
+import { MapPin, Zap, Car, TrendingUp, ChevronRight, Loader2, Lightbulb, DollarSign, Server, BarChart3 } from "lucide-react";
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import type { Layer, LeafletMouseEvent, LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -526,42 +526,120 @@ const MapSimulationPage = () => {
             </div>
 
             {/* Results dashboard */}
-            <div className="lg:col-span-2">
-              {estimate && selectedParish ? (
+            <div className="lg:col-span-2 relative">
+              {/* Loading overlay */}
+              {loadingFreguesiaData && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-sm rounded-lg">
+                  <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">A carregar dados da freguesia...</p>
+                  </div>
+                </div>
+              )}
+
+              {freguesiaError && (
+                <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
+                  <p className="text-sm text-destructive">{freguesiaError}</p>
+                </div>
+              )}
+
+              {freguesiaData && selectedParish ? (
                 <div className="space-y-6">
+                  {/* Header */}
                   <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 glow-primary">
                     <h3 className="font-heading font-bold text-lg">{selectedParish}</h3>
                     <p className="text-sm text-muted-foreground">{selectedMunicipality}, {selectedDistrict} · Portugal</p>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[
-                      { icon: Zap, label: "Lighting Points", value: estimate.lightingPoints.toLocaleString() },
-                      { icon: Car, label: "Potential EV Chargers", value: estimate.evCapacity.toLocaleString() },
-                      { icon: TrendingUp, label: "Monthly Revenue", value: `€${estimate.monthlyRevenue.toLocaleString()}` },
-                    ].map((card) => (
-                      <div key={card.label} className="rounded-lg border border-border bg-card p-5">
-                        <card.icon className="h-5 w-5 text-primary mb-2" />
-                        <div className="text-2xl font-heading font-black">{card.value}</div>
-                        <div className="text-xs text-muted-foreground mt-1">{card.label}</div>
+                  {/* Lighting Overview */}
+                  <div>
+                    <h4 className="text-sm font-mono font-medium text-accent uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4" /> Lighting Overview
+                    </h4>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Total Luminaires</div>
+                        <div className="text-2xl font-heading font-black">{freguesiaData.total.total_lights.toLocaleString("de-DE")}</div>
                       </div>
-                    ))}
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Percentage of LEDs</div>
+                        <div className="text-2xl font-heading font-black">{freguesiaData.led.led_percentage}%</div>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="rounded-lg border border-border bg-card p-5">
-                      <div className="text-sm text-muted-foreground mb-1">Infrastructure Savings</div>
-                      <div className="text-3xl font-heading font-black text-accent">€{estimate.infraSavings.toLocaleString()}</div>
-                      <div className="text-xs text-muted-foreground mt-1">vs traditional grid extension</div>
+                  {/* EV Charging Capacity */}
+                  <div>
+                    <h4 className="text-sm font-mono font-medium text-accent uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <Car className="h-4 w-4" /> EV Charging Capacity
+                    </h4>
+                    <div className="grid sm:grid-cols-3 gap-4">
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Current EV Chargers (Now)</div>
+                        <div className="text-2xl font-heading font-black">{freguesiaData.dc.current_chargers.toLocaleString("de-DE")}</div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">EV Chargers with DC Solution</div>
+                        <div className="text-2xl font-heading font-black text-primary">{freguesiaData.dc.dc_chargers.toLocaleString("de-DE")}</div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Increase in Chargers</div>
+                        <div className="text-2xl font-heading font-black text-accent">+{(freguesiaData.dc.dc_chargers - freguesiaData.dc.current_chargers).toLocaleString("de-DE")}</div>
+                      </div>
                     </div>
-                    <div className="rounded-lg border border-border bg-card p-5">
-                      <div className="text-sm text-muted-foreground mb-1">RACK01 Units Required</div>
-                      <div className="text-3xl font-heading font-black text-primary">{estimate.rackUnits}</div>
-                      <div className="text-xs text-muted-foreground mt-1">Grid segments to convert: {estimate.gridSegments}</div>
+                  </div>
+
+                  {/* Power & Infrastructure */}
+                  <div>
+                    <h4 className="text-sm font-mono font-medium text-accent uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <Server className="h-4 w-4" /> Power & Infrastructure
+                    </h4>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Current AC Power Available</div>
+                        <div className="text-2xl font-heading font-black">{freguesiaData.dc.ac_power.toLocaleString("de-DE")} kW</div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Additional DC Power Capacity</div>
+                        <div className="text-2xl font-heading font-black text-primary">{freguesiaData.dc.dc_power.toLocaleString("de-DE")} kW</div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Number of Racks Required</div>
+                        <div className="text-2xl font-heading font-black">{freguesiaData.dc.number_of_racks.toLocaleString("de-DE")}</div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Annual LED Energy Savings</div>
+                        <div className="text-2xl font-heading font-black text-accent">{formatEuro(freguesiaData.dc.led_annual_savings)}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Financial Comparison */}
+                  <div>
+                    <h4 className="text-sm font-mono font-medium text-accent uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" /> Financial Comparison
+                    </h4>
+                    <div className="grid sm:grid-cols-3 gap-4">
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">DC Solution Investment</div>
+                        <div className="text-2xl font-heading font-black text-primary">{formatEuro(freguesiaData.dc.investment_value_dc)}</div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Traditional AC Investment Cost</div>
+                        <div className="text-2xl font-heading font-black">{formatEuro(freguesiaData.dc.investment_value_ac)}</div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-card p-5">
+                        <div className="text-xs text-muted-foreground mb-1">Savings vs Traditional AC</div>
+                        <div className="text-2xl font-heading font-black text-accent">
+                          {freguesiaData.dc.investment_value_ac > 0
+                            ? (((freguesiaData.dc.investment_value_ac - freguesiaData.dc.investment_value_dc) / freguesiaData.dc.investment_value_ac) * 100).toFixed(1) + "%"
+                            : "N/A"}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              ) : (
+              ) : !loadingFreguesiaData && !freguesiaError ? (
                 <div className="flex items-center justify-center h-full rounded-lg border border-dashed border-border bg-card/50 p-16">
                   <div className="text-center">
                     <MapPin className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
@@ -572,7 +650,7 @@ const MapSimulationPage = () => {
                     </p>
                   </div>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
