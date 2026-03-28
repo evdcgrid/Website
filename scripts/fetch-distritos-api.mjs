@@ -8,6 +8,7 @@ import {
   pickLevelByExpectedCount,
   relationIdFromFeature,
   convertElementsToRelationFeatures,
+  simplifyGeometry,
   normalize,
   slugifyPlaceName,
   clearJsonFilesInDir,
@@ -43,7 +44,7 @@ try {
       properties: {
         name: districtName,
       },
-      geometry: feature.geometry,
+      geometry: simplifyGeometry(feature.geometry, { tolerance: 0.00012, decimals: 6 }),
     };
   });
 

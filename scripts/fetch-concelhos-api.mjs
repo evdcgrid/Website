@@ -9,6 +9,7 @@ import {
   pickLevelByExpectedCount as pickClosestLevel,
   relationIdFromFeature,
   convertElementsToRelationFeatures,
+  simplifyGeometry,
   squaredDistance,
   normalize,
   normalizeKey,
@@ -120,7 +121,7 @@ try {
         name: municipalityName,
         district: districtName,
       },
-      geometry: feature.geometry,
+      geometry: simplifyGeometry(feature.geometry, { tolerance: 0.0001, decimals: 6 }),
     };
   });
 

@@ -8,6 +8,7 @@ import {
   pickLevelByExpectedCount,
   relationIdFromFeature,
   convertElementsToRelationFeatures,
+  simplifyGeometry,
   normalize,
   slugifyPlaceName,
   sleep,
@@ -180,7 +181,7 @@ try {
         n: parishName,
         m: municipalityName,
       },
-      geometry: feature.geometry,
+      geometry: simplifyGeometry(feature.geometry, { tolerance: 0.00008, decimals: 6 }),
     };
   });
 
