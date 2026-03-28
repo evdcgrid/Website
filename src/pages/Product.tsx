@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar";
-import rackImage from "@/assets/rack01-product.jpg";
+import rackImage from "@/assets/rack01-product.png";
 import Footer from "@/components/Footer";
 import { Cpu, Shield, Zap, Radio, Globe, Gauge, BatteryCharging, CircuitBoard } from "lucide-react";
 import {
@@ -37,7 +37,7 @@ const ProductPage = () => (
 
     {/* Hero */}
     <section className="pt-32 pb-20 relative overflow-hidden">
-      <div className="absolute inset-0 grid-pattern opacity-30" />
+      <div className="absolute inset-0 opacity-30" />
       <div className="section-container relative z-10 text-center">
         <span className="text-xs font-mono font-medium text-primary uppercase tracking-widest">Product</span>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black mt-4">
