@@ -46,17 +46,6 @@ const HeroSection = () => (
         </div>
 
         {/* Stats bar */}
-        <div className="animate-fade-up-delay-3 mt-16 grid grid-cols-2 gap-6 border-t border-border pt-8 max-w-lg">
-          {[
-            { value: "9×", label: "More charging capacity needed" },
-            { value: "€100B", label: "Investment projected in EU" },
-          ].map((stat) => (
-            <div key={stat.label}>
-              <div className="text-2xl sm:text-3xl font-heading font-black text-primary">{stat.value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   </section>
