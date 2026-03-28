@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
+import logo from "@/assets/logo_c_white.svg";
 
 const Footer = () => (
   <footer className="border-t border-border bg-card py-12">
@@ -7,8 +8,7 @@ const Footer = () => (
       <div className="grid gap-8 md:grid-cols-4">
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Zap className="h-5 w-5 text-primary" />
-            <span className="font-heading font-bold text-lg">EVDCGRID</span>
+            <img src={logo} alt="EVDCGRID" className="h-[30px] w-auto text-primary" />
           </div>
           <p className="text-sm text-muted-foreground">
             Transforming public lighting grids into DC infrastructure for EV charging.

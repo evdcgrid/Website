@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import logo from "@/assets/evdcgrid-logo.svg";
+import logo from "@/assets/logo_c_white.svg";
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -18,7 +18,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="section-container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="EVDCGRID" className="h-8 invert" />
+          <img src={logo} alt="EVDCGRID" className="h-[35px] w-auto" />
         </Link>
 
         {/* Desktop */}
