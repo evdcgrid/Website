@@ -38,13 +38,27 @@ const colors = {
   parishSelected: { fillColor: "#b060e0", weight: 2.5, fillOpacity: 0.5, color: "#d080ff" },
 };
 
-function FlyToBounds({ bounds }: { bounds: LatLngBoundsExpression | null }) {
+function FlyToBounds({
+  bounds,
+  onDone,
+}: {
+  bounds: LatLngBoundsExpression | null;
+  onDone?: () => void;
+}) {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
+      const handleMoveEnd = () => {
+        onDone?.();
+      };
+      map.once("moveend", handleMoveEnd);
       map.flyToBounds(bounds, { padding: [30, 30], duration: 0.8 });
+
+      return () => {
+        map.off("moveend", handleMoveEnd);
+      };
     }
-  }, [bounds, map]);
+  }, [bounds, map, onDone]);
   return null;
 }
 
@@ -70,6 +84,9 @@ const MapSimulationPage = () => {
 
   const [flyBounds, setFlyBounds] = useState<LatLngBoundsExpression | null>(null);
   const [defaultView, setDefaultView] = useState(true);
+  const [zoomTargetLevel, setZoomTargetLevel] = useState<"district" | "municipality" | "parish" | null>(null);
+  const [isDistrictZooming, setIsDistrictZooming] = useState(false);
+  const [isMunicipalityZooming, setIsMunicipalityZooming] = useState(false);
 
   // Load districts from portugal_map hierarchy.
   useEffect(() => {
@@ -183,7 +200,12 @@ const MapSimulationPage = () => {
           setSelectedParish(null);
           setDefaultView(false);
           const bounds = (layer as any).getBounds?.();
-          if (bounds) setFlyBounds(bounds);
+          if (bounds) {
+            setZoomTargetLevel("district");
+            setIsDistrictZooming(true);
+            setIsMunicipalityZooming(false);
+            setFlyBounds(bounds);
+          }
         },
       });
     },
@@ -214,7 +236,11 @@ const MapSimulationPage = () => {
           setSelectedMunicipality(name);
           setSelectedParish(null);
           const bounds = (layer as any).getBounds?.();
-          if (bounds) setFlyBounds(bounds);
+          if (bounds) {
+            setZoomTargetLevel("municipality");
+            setIsMunicipalityZooming(true);
+            setFlyBounds(bounds);
+          }
         },
       });
     },
@@ -244,7 +270,10 @@ const MapSimulationPage = () => {
         click: () => {
           setSelectedParish(name);
           const bounds = (layer as any).getBounds?.();
-          if (bounds) setFlyBounds(bounds);
+          if (bounds) {
+            setZoomTargetLevel("parish");
+            setFlyBounds(bounds);
+          }
         },
       });
     },
@@ -267,7 +296,20 @@ const MapSimulationPage = () => {
     setFilteredParishes(null);
     setFlyBounds(null);
     setDefaultView(true);
+    setZoomTargetLevel(null);
+    setIsDistrictZooming(false);
+    setIsMunicipalityZooming(false);
   };
+
+  const onFlyBoundsDone = useCallback(() => {
+    if (zoomTargetLevel === "district") {
+      setIsDistrictZooming(false);
+    }
+    if (zoomTargetLevel === "municipality") {
+      setIsMunicipalityZooming(false);
+    }
+    setZoomTargetLevel(null);
+  }, [zoomTargetLevel]);
 
   const goBackToDistrict = () => {
     setSelectedMunicipality(null);
@@ -364,7 +406,7 @@ const MapSimulationPage = () => {
                   )}
 
                   {/* Municipalities layer */}
-                  {filteredMunis && selectedDistrict && (
+                  {filteredMunis && selectedDistrict && !isDistrictZooming && (
                     <GeoJSON
                       key={"munis-" + selectedDistrict + "-" + (selectedMunicipality || "none")}
                       data={filteredMunis as any}
@@ -374,7 +416,7 @@ const MapSimulationPage = () => {
                   )}
 
                   {/* Parishes layer */}
-                  {filteredParishes && selectedMunicipality && (
+                  {filteredParishes && selectedMunicipality && !isMunicipalityZooming && (
                     <GeoJSON
                       key={"parishes-" + selectedMunicipality + "-" + (selectedParish || "none")}
                       data={filteredParishes as any}
@@ -383,7 +425,7 @@ const MapSimulationPage = () => {
                     />
                   )}
 
-                  {flyBounds && <FlyToBounds bounds={flyBounds} />}
+                  {flyBounds && <FlyToBounds bounds={flyBounds} onDone={onFlyBoundsDone} />}
                   {defaultView && <FlyTo center={[39.6, -8.0]} zoom={7} />}
                 </MapContainer>
               </div>
