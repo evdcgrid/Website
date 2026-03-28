@@ -3,9 +3,9 @@ import { TrendingUp, AlertTriangle, Plug, Car } from "lucide-react";
 
 const stats = [
   { icon: TrendingUp, value: 9, suffix: "×", label: "More EV charging capacity needed in Europe", color: "text-primary" },
-  { icon: AlertTriangle, value: 100, suffix: "B€", label: "Investment required for grid infrastructure", color: "text-accent" },
+  { icon: AlertTriangle, value: 100, suffix: "B€", label: "Investment required in infrastructure", color: "text-accent" },
   { icon: Plug, value: 40, suffix: "%", label: "Of costs are grid infrastructure alone", color: "text-primary" },
-  { icon: Car, value: 2, suffix: "×", label: "Portugal's EV fleet will double by 2030", color: "text-accent" },
+  { icon: Car, value: 2, suffix: "×", label: "Europe's EV fleet will double by 2030", color: "text-accent" },
 ];
 
 const AnimatedCounter = ({ value, suffix }: { value: number; suffix: string }) => {
@@ -48,7 +48,7 @@ const ProblemSection = () => (
           Europe's Grid <span className="gradient-text">Can't Keep Up</span>
         </h2>
         <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-          The transition to electric mobility demands massive grid upgrades. Current approaches are too slow, too expensive, and too disruptive.
+          The transition to electric mobility demands massive grid upgrades. Current approaches are too slow and expensive.
         </p>
       </div>
 
