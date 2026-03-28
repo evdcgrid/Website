@@ -43,6 +43,13 @@ const HeroSection = () => (
             <Play size={16} />
             Run Simulation
           </Link>
+          <Link
+            to="/map"
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-6 py-3 text-sm font-semibold text-secondary-foreground transition-all hover:bg-secondary/80"
+          >
+            <MapPin size={16} />
+            Map Explorer
+          </Link>
         </div>
 
         {/* Stats bar */}
