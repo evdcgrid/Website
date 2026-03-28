@@ -166,21 +166,67 @@ const MapSimulationPage = () => {
     };
   }, [selectedDistrict, selectedMunicipality]);
 
-  const estimate = selectedParish
-    ? (() => {
-        const hash = selectedParish.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-        const lightingPoints = 200 + ((hash * 37) % 5000);
-        const evCapacity = Math.floor(lightingPoints * 0.05);
-        return {
-          lightingPoints,
-          evCapacity,
-          monthlyRevenue: evCapacity * 800,
-          infraSavings: Math.floor(lightingPoints * 120 * 0.41),
-          gridSegments: Math.ceil(lightingPoints / 50),
-          rackUnits: Math.ceil(lightingPoints / 50),
-        };
-      })()
-    : null;
+  interface FreguesiaData {
+    total: { total_lights: number };
+    led: { led_percentage: number };
+    dc: {
+      current_chargers: number;
+      dc_chargers: number;
+      ac_power: number;
+      dc_power: number;
+      number_of_racks: number;
+      led_annual_savings: number;
+      investment_value_dc: number;
+      investment_value_ac: number;
+    };
+  }
+
+  const [freguesiaData, setFreguesiaData] = useState<FreguesiaData | null>(null);
+  const [loadingFreguesiaData, setLoadingFreguesiaData] = useState(false);
+  const [freguesiaError, setFreguesiaError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedParish) {
+      setFreguesiaData(null);
+      setFreguesiaError(null);
+      return;
+    }
+    let active = true;
+    const controller = new AbortController();
+
+    setLoadingFreguesiaData(true);
+    setFreguesiaData(null);
+    setFreguesiaError(null);
+
+    fetch("https://diogo-guerreiro.app.n8n.cloud/webhook/evdc-grid-freguesias", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ freguesia: selectedParish }),
+      signal: controller.signal,
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error("Backend error");
+        return r.json();
+      })
+      .then((data) => {
+        if (!active) return;
+        setFreguesiaData(data[0]);
+        setLoadingFreguesiaData(false);
+      })
+      .catch((err) => {
+        if (!active || err?.name === "AbortError") return;
+        setFreguesiaError("Erro ao carregar dados. Tenta novamente.");
+        setLoadingFreguesiaData(false);
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [selectedParish]);
+
+  const formatEuro = (value: number) =>
+    value.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " €";
 
   // District layer handlers
   const onEachDistrict = useCallback(
