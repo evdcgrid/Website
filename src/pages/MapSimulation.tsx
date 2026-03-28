@@ -1,45 +1,87 @@
-import { useState } from "react";
-import { MapPin, Zap, Car, TrendingUp } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MapPin, Zap, Car, TrendingUp, ChevronRight, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const parishes = [
-  { name: "Alcântara", lightingPoints: 1200, municipality: "Lisboa" },
-  { name: "Areeiro", lightingPoints: 850, municipality: "Lisboa" },
-  { name: "Belém", lightingPoints: 1500, municipality: "Lisboa" },
-  { name: "Benfica", lightingPoints: 2200, municipality: "Lisboa" },
-  { name: "Campo de Ourique", lightingPoints: 900, municipality: "Lisboa" },
-  { name: "Cascais e Estoril", lightingPoints: 3200, municipality: "Cascais" },
-  { name: "Almada", lightingPoints: 4500, municipality: "Almada" },
-  { name: "Sintra", lightingPoints: 5800, municipality: "Sintra" },
-  { name: "Oeiras", lightingPoints: 2800, municipality: "Oeiras" },
-  { name: "Amadora", lightingPoints: 3100, municipality: "Amadora" },
-  { name: "Porto Centro", lightingPoints: 3400, municipality: "Porto" },
-  { name: "Vila Nova de Gaia", lightingPoints: 6200, municipality: "V.N. Gaia" },
-  { name: "Braga", lightingPoints: 4100, municipality: "Braga" },
-  { name: "Coimbra", lightingPoints: 3800, municipality: "Coimbra" },
-  { name: "Faro", lightingPoints: 2100, municipality: "Faro" },
-];
+const API_BASE = "https://json.geoapi.pt";
 
 const MapSimulationPage = () => {
-  const [selected, setSelected] = useState<typeof parishes[0] | null>(null);
-  const [search, setSearch] = useState("");
+  const [districts, setDistricts] = useState<string[]>([]);
+  const [municipalities, setMunicipalities] = useState<string[]>([]);
+  const [parishes, setParishes] = useState<string[]>([]);
 
-  const filtered = parishes.filter(
-    (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.municipality.toLowerCase().includes(search.toLowerCase())
-  );
+  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+  const [selectedMunicipality, setSelectedMunicipality] = useState<string | null>(null);
+  const [selectedParish, setSelectedParish] = useState<string | null>(null);
 
-  const estimate = selected
-    ? {
-        lightingPoints: selected.lightingPoints,
-        evCapacity: Math.floor(selected.lightingPoints * 0.05),
-        monthlyRevenue: Math.floor(selected.lightingPoints * 0.05 * 800),
-        infraSavings: Math.floor(selected.lightingPoints * 120 * 0.41),
-        gridSegments: Math.ceil(selected.lightingPoints / 50),
-        rackUnits: Math.ceil(selected.lightingPoints / 50),
-      }
+  const [loadingDistricts, setLoadingDistricts] = useState(true);
+  const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
+  const [loadingParishes, setLoadingParishes] = useState(false);
+
+  // Fetch districts on mount
+  useEffect(() => {
+    fetch(`${API_BASE}/distritos`)
+      .then((r) => r.json())
+      .then((data) => {
+        setDistricts(data.map((d: { distrito: string }) => d.distrito).sort());
+      })
+      .catch(() => setDistricts([]))
+      .finally(() => setLoadingDistricts(false));
+  }, []);
+
+  // Fetch municipalities when district changes
+  useEffect(() => {
+    if (!selectedDistrict) {
+      setMunicipalities([]);
+      return;
+    }
+    setLoadingMunicipalities(true);
+    setSelectedMunicipality(null);
+    setSelectedParish(null);
+    setParishes([]);
+    fetch(`${API_BASE}/distrito/${encodeURIComponent(selectedDistrict)}/municipios`)
+      .then((r) => r.json())
+      .then((data) => {
+        setMunicipalities(
+          (data.municipios as { nome: string }[]).map((m) => m.nome).sort()
+        );
+      })
+      .catch(() => setMunicipalities([]))
+      .finally(() => setLoadingMunicipalities(false));
+  }, [selectedDistrict]);
+
+  // Fetch parishes when municipality changes
+  useEffect(() => {
+    if (!selectedMunicipality) {
+      setParishes([]);
+      return;
+    }
+    setLoadingParishes(true);
+    setSelectedParish(null);
+    fetch(`${API_BASE}/municipio/${encodeURIComponent(selectedMunicipality)}/freguesias`)
+      .then((r) => r.json())
+      .then((data) => {
+        setParishes((data.freguesias as string[]).sort());
+      })
+      .catch(() => setParishes([]))
+      .finally(() => setLoadingParishes(false));
+  }, [selectedMunicipality]);
+
+  // Generate estimate based on parish name hash for consistent "random" data
+  const estimate = selectedParish
+    ? (() => {
+        const hash = selectedParish.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+        const lightingPoints = 200 + (hash * 37) % 5000;
+        const evCapacity = Math.floor(lightingPoints * 0.05);
+        return {
+          lightingPoints,
+          evCapacity,
+          monthlyRevenue: evCapacity * 800,
+          infraSavings: Math.floor(lightingPoints * 120 * 0.41),
+          gridSegments: Math.ceil(lightingPoints / 50),
+          rackUnits: Math.ceil(lightingPoints / 50),
+        };
+      })()
     : null;
 
   return (
@@ -58,48 +100,155 @@ const MapSimulationPage = () => {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Parish selector */}
-            <div className="lg:col-span-1">
-              <div className="rounded-lg border border-border bg-card p-6">
-                <h3 className="font-heading font-bold text-sm mb-4">Select Freguesia</h3>
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground mb-4 focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <div className="space-y-1 max-h-96 overflow-y-auto">
-                  {filtered.map((p) => (
-                    <button
-                      key={p.name}
-                      onClick={() => setSelected(p)}
-                      className={`w-full text-left rounded-md px-3 py-2.5 text-sm transition-colors ${
-                        selected?.name === p.name
-                          ? "bg-primary/10 text-primary border border-primary/30"
-                          : "hover:bg-secondary text-muted-foreground"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <MapPin size={14} />
-                        <span className="font-medium">{p.name}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground ml-6">
-                        {p.municipality} · {p.lightingPoints.toLocaleString()} lighting points
-                      </div>
-                    </button>
-                  ))}
+            {/* Location selector */}
+            <div className="lg:col-span-1 space-y-4">
+              {/* Breadcrumb */}
+              {(selectedDistrict || selectedMunicipality || selectedParish) && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap">
+                  <button onClick={() => { setSelectedDistrict(null); setSelectedMunicipality(null); setSelectedParish(null); }} className="hover:text-primary transition-colors">
+                    Portugal
+                  </button>
+                  {selectedDistrict && (
+                    <>
+                      <ChevronRight size={12} />
+                      <button onClick={() => { setSelectedMunicipality(null); setSelectedParish(null); }} className="hover:text-primary transition-colors">
+                        {selectedDistrict}
+                      </button>
+                    </>
+                  )}
+                  {selectedMunicipality && (
+                    <>
+                      <ChevronRight size={12} />
+                      <button onClick={() => setSelectedParish(null)} className="hover:text-primary transition-colors">
+                        {selectedMunicipality}
+                      </button>
+                    </>
+                  )}
+                  {selectedParish && (
+                    <>
+                      <ChevronRight size={12} />
+                      <span className="text-primary font-medium">{selectedParish}</span>
+                    </>
+                  )}
                 </div>
-              </div>
+              )}
+
+              {/* Step 1: District */}
+              {!selectedDistrict && (
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <h3 className="font-heading font-bold text-sm mb-4 flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
+                    Distrito
+                  </h3>
+                  {loadingDistricts ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                    </div>
+                  ) : (
+                    <div className="space-y-1 max-h-[28rem] overflow-y-auto">
+                      {districts.map((d) => (
+                        <button
+                          key={d}
+                          onClick={() => setSelectedDistrict(d)}
+                          className="w-full text-left rounded-md px-3 py-2.5 text-sm transition-colors hover:bg-primary/10 hover:text-primary text-muted-foreground"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{d}</span>
+                            <ChevronRight size={14} className="opacity-40" />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 2: Municipality */}
+              {selectedDistrict && !selectedMunicipality && (
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <h3 className="font-heading font-bold text-sm mb-4 flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
+                    Concelho
+                  </h3>
+                  {loadingMunicipalities ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                    </div>
+                  ) : (
+                    <div className="space-y-1 max-h-[28rem] overflow-y-auto">
+                      {municipalities.map((m) => (
+                        <button
+                          key={m}
+                          onClick={() => setSelectedMunicipality(m)}
+                          className="w-full text-left rounded-md px-3 py-2.5 text-sm transition-colors hover:bg-primary/10 hover:text-primary text-muted-foreground"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{m}</span>
+                            <ChevronRight size={14} className="opacity-40" />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 3: Parish */}
+              {selectedMunicipality && !selectedParish && (
+                <div className="rounded-lg border border-border bg-card p-6">
+                  <h3 className="font-heading font-bold text-sm mb-4 flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
+                    Freguesia
+                  </h3>
+                  {loadingParishes ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                    </div>
+                  ) : (
+                    <div className="space-y-1 max-h-[28rem] overflow-y-auto">
+                      {parishes.map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => setSelectedParish(p)}
+                          className="w-full text-left rounded-md px-3 py-2.5 text-sm transition-colors hover:bg-primary/10 hover:text-primary text-muted-foreground"
+                        >
+                          <div className="flex items-center gap-2">
+                            <MapPin size={14} />
+                            <span className="font-medium">{p}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Selected summary */}
+              {selectedParish && (
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 glow-primary">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPin size={16} className="text-primary" />
+                    <h3 className="font-heading font-bold text-sm">Selecionado</h3>
+                  </div>
+                  <div className="text-lg font-heading font-black">{selectedParish}</div>
+                  <div className="text-sm text-muted-foreground">{selectedMunicipality}, {selectedDistrict}</div>
+                  <button
+                    onClick={() => { setSelectedDistrict(null); setSelectedMunicipality(null); setSelectedParish(null); }}
+                    className="mt-4 text-xs text-primary hover:underline"
+                  >
+                    Alterar seleção
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Results dashboard */}
             <div className="lg:col-span-2">
-              {estimate ? (
+              {estimate && selectedParish ? (
                 <div className="space-y-6">
                   <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 glow-primary">
-                    <h3 className="font-heading font-bold text-lg">{selected!.name}</h3>
-                    <p className="text-sm text-muted-foreground">{selected!.municipality}, Portugal</p>
+                    <h3 className="font-heading font-bold text-lg">{selectedParish}</h3>
+                    <p className="text-sm text-muted-foreground">{selectedMunicipality}, {selectedDistrict} · Portugal</p>
                   </div>
 
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -133,7 +282,13 @@ const MapSimulationPage = () => {
                 <div className="flex items-center justify-center h-full rounded-lg border border-dashed border-border bg-card/50 p-16">
                   <div className="text-center">
                     <MapPin className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground">Select a freguesia to view estimates</p>
+                    <p className="text-muted-foreground">
+                      {!selectedDistrict
+                        ? "Selecione um distrito para começar"
+                        : !selectedMunicipality
+                        ? "Selecione um concelho"
+                        : "Selecione uma freguesia para ver estimativas"}
+                    </p>
                   </div>
                 </div>
               )}
