@@ -1,28 +1,28 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { TrendingDown, Zap, Cable, Wrench, MapPin, ArrowRight, CheckCircle2 } from "lucide-react";
+import { TrendingDown, Zap, Cable, MapPin, CheckCircle2 } from "lucide-react";
 
 const acExcavation = [
-  { item: "Escavação Mecânica", range: "25€ - 40€/m³", value: "25€/m³" },
-  { item: "Abertura e Fecho de Vala (Ambiente Urbano)", range: "80€ - 120€", value: "80€" },
-  { item: "Cablagem e Tubagem", range: "20€ - 30€", value: "20€" },
-  { item: "Mão de Obra e Licenciamento", range: "150€ - 200€/m", value: "150€/m" },
-  { item: "Distância", range: "400 - 800m", value: "400m" },
+  { item: "Mechanical Excavation", range: "25€ - 40€/m³", value: "25€/m³" },
+  { item: "Trench Opening & Closing (Urban)", range: "80€ - 120€", value: "80€" },
+  { item: "Cabling & Piping", range: "20€ - 30€", value: "20€" },
+  { item: "Labour & Licensing", range: "150€ - 200€/m", value: "150€/m" },
+  { item: "Distance", range: "400 - 800m", value: "400m" },
 ];
 
 const acObras = [
-  { item: "Projeto", value: 2500 },
-  { item: "Licenciamento", value: 400 },
-  { item: "Saída QGBT", value: 2500 },
+  { item: "Project Design", value: 2500 },
+  { item: "Licensing", value: 400 },
+  { item: "QGBT Output", value: 2500 },
   { item: "AIP", value: 2500 },
-  { item: "Construção", value: 15000 },
-  { item: "Instalação", value: 22900 },
+  { item: "Construction", value: 15000 },
+  { item: "Installation", value: 22900 },
 ];
 
 const dcItems = [
   { item: "Rack", value: 52000 },
-  { item: "Lâmpadas", value: 4500 },
-  { item: "Instalação", value: 40000 },
+  { item: "LED Lamps", value: 4500 },
+  { item: "Installation", value: 40000 },
 ];
 
 const totalAC = 132900;
@@ -42,14 +42,14 @@ const CaseStudyPage = () => {
         <div className="section-container relative z-10">
           <div className="flex items-center gap-2 text-primary mb-4">
             <MapPin size={18} />
-            <span className="text-sm font-mono font-semibold tracking-wider uppercase">Areeiro, Lisboa</span>
+            <span className="text-sm font-mono font-semibold tracking-wider uppercase">Areeiro, Lisbon</span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black mb-4 leading-tight">
-            Caso de Estudo:<br />
-            <span className="text-primary">Bairro no Areeiro</span>
+            Case Study:<br />
+            <span className="text-primary">Areeiro Neighbourhood</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl">
-            Análise comparativa de custos entre infraestrutura de iluminação pública tradicional (AC) e o sistema DC Grid, demonstrando poupanças significativas em obra civil e instalação.
+            Comparative cost analysis between traditional AC public lighting infrastructure and the DC Grid system, demonstrating significant savings in civil works and installation.
           </p>
         </div>
       </section>
@@ -60,27 +60,27 @@ const CaseStudyPage = () => {
           <div className="rounded-xl border border-border bg-card p-6 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-destructive/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
-              <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider mb-2">Custo Total AC</p>
+              <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider mb-2">Total AC Cost</p>
               <p className="text-3xl font-heading font-black text-destructive">{fmt(totalAC)} €</p>
-              <p className="text-xs text-muted-foreground mt-1">Sistema tradicional</p>
+              <p className="text-xs text-muted-foreground mt-1">Traditional system</p>
             </div>
           </div>
           <div className="rounded-xl border border-primary/30 bg-card p-6 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
-              <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider mb-2">Custo Total DC</p>
+              <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider mb-2">Total DC Cost</p>
               <p className="text-3xl font-heading font-black text-primary">{fmt(totalDC)} €</p>
-              <p className="text-xs text-muted-foreground mt-1">Sistema DC Grid</p>
+              <p className="text-xs text-muted-foreground mt-1">DC Grid system</p>
             </div>
           </div>
           <div className="rounded-xl border border-accent/30 bg-card p-6 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
-              <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider mb-2">Poupança</p>
+              <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider mb-2">Savings</p>
               <p className="text-3xl font-heading font-black text-accent">
                 {savingsPercent.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %
               </p>
-              <p className="text-xs text-muted-foreground mt-1">{fmt(totalAC - totalDC)} € de poupança</p>
+              <p className="text-xs text-muted-foreground mt-1">{fmt(totalAC - totalDC)} € saved</p>
             </div>
           </div>
         </div>
@@ -96,15 +96,15 @@ const CaseStudyPage = () => {
                 <Cable size={20} className="text-destructive" />
               </div>
               <div>
-                <h2 className="text-xl font-heading font-bold">Sistema AC Tradicional</h2>
-                <p className="text-sm text-muted-foreground">Infraestrutura convencional</p>
+                <h2 className="text-xl font-heading font-bold">Traditional AC System</h2>
+                <p className="text-sm text-muted-foreground">Conventional infrastructure</p>
               </div>
             </div>
 
-            {/* Escavação */}
+            {/* Excavation */}
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="px-5 py-3 border-b border-border bg-secondary/30">
-                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Escavação</h3>
+                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Excavation</h3>
               </div>
               <div className="divide-y divide-border">
                 {acExcavation.map((row) => (
@@ -117,16 +117,16 @@ const CaseStudyPage = () => {
                   </div>
                 ))}
                 <div className="flex items-center justify-between px-5 py-3 bg-secondary/20">
-                  <span className="text-sm font-semibold text-foreground">Subtotal Obras</span>
+                  <span className="text-sm font-semibold text-foreground">Works Subtotal</span>
                   <span className="font-mono font-bold text-foreground">{fmt(110000)} €</span>
                 </div>
               </div>
             </div>
 
-            {/* Obras */}
+            {/* Works */}
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="px-5 py-3 border-b border-border bg-secondary/30">
-                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Obras & Instalação</h3>
+                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Works & Installation</h3>
               </div>
               <div className="divide-y divide-border">
                 {acObras.map((row) => (
@@ -152,14 +152,14 @@ const CaseStudyPage = () => {
                 <Zap size={20} className="text-primary" />
               </div>
               <div>
-                <h2 className="text-xl font-heading font-bold">Sistema DC Grid</h2>
-                <p className="text-sm text-muted-foreground">Infraestrutura otimizada</p>
+                <h2 className="text-xl font-heading font-bold">DC Grid System</h2>
+                <p className="text-sm text-muted-foreground">Optimised infrastructure</p>
               </div>
             </div>
 
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="px-5 py-3 border-b border-border bg-secondary/30">
-                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Componentes</h3>
+                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Components</h3>
               </div>
               <div className="divide-y divide-border">
                 {dcItems.map((row) => (
@@ -179,13 +179,13 @@ const CaseStudyPage = () => {
 
             {/* Advantages */}
             <div className="rounded-xl border border-accent/20 bg-accent/5 p-6 space-y-4">
-              <h3 className="text-lg font-heading font-bold text-accent">Vantagens DC Grid</h3>
+              <h3 className="text-lg font-heading font-bold text-accent">DC Grid Advantages</h3>
               <ul className="space-y-3">
                 {[
-                  "Sem escavação — eliminação total de obra civil",
-                  "Instalação mais rápida e menos disruptiva",
-                  "Menor custo de licenciamento e projeto",
-                  "Infraestrutura modular e escalável",
+                  "No excavation — full elimination of civil works",
+                  "Faster and less disruptive installation",
+                  "Lower licensing and project design costs",
+                  "Modular and scalable infrastructure",
                 ].map((text) => (
                   <li key={text} className="flex items-start gap-3 text-sm text-foreground">
                     <CheckCircle2 size={16} className="text-accent mt-0.5 shrink-0" />
@@ -198,7 +198,7 @@ const CaseStudyPage = () => {
             {/* Savings Bar */}
             <div className="rounded-xl border border-border bg-card p-6">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Poupança</span>
+                <span className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Savings</span>
                 <div className="flex items-center gap-1 text-accent">
                   <TrendingDown size={16} />
                   <span className="font-mono font-bold">
@@ -214,7 +214,7 @@ const CaseStudyPage = () => {
               </div>
               <div className="flex justify-between mt-2 text-xs text-muted-foreground">
                 <span>0 €</span>
-                <span className="font-semibold text-accent">{fmt(totalAC - totalDC)} € poupados</span>
+                <span className="font-semibold text-accent">{fmt(totalAC - totalDC)} € saved</span>
                 <span>{fmt(totalAC)} €</span>
               </div>
             </div>

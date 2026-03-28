@@ -39,7 +39,7 @@ const CTASection = () => (
             className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-6 py-3 text-sm font-semibold text-secondary-foreground transition-all hover:bg-secondary/80"
           >
             <FileText size={16} />
-            Caso de Estudo
+            Case Study
           </Link>
         </div>
       </div>
