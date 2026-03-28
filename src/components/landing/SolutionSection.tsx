@@ -34,7 +34,7 @@ const SolutionSection = () => (
             <span className="gradient-text">EV Infrastructure</span>
           </h2>
           <p className="text-muted-foreground mt-4 leading-relaxed">
-            EVDCGRID converts existing AC public lighting grids into high-capacity DC grids. By reusing 98% of existing infrastructure, we deliver EV charging capability at 41% lower cost and 75% faster deployment.
+            EVDCGRID converts existing AC public lighting grids into high-capacity DC grids. By reusing 98% of existing infrastructure, we deliver grid upgrades at 41% lower cost and 75% faster deployment.
           </p>
 
           {/* AC vs DC visual */}
@@ -50,7 +50,7 @@ const SolutionSection = () => (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 glow-primary">
               <div className="text-xs font-mono text-primary mb-2">AFTER (DC)</div>
               <div className="font-mono text-sm text-foreground">
-                2× 1400V DC Lines<br />
+                2× 700V bipolar DC Lines<br />
                 4× Capacity<br />
                 Lighting + EV Charging
               </div>

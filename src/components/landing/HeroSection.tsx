@@ -25,7 +25,7 @@ const HeroSection = () => (
         </h1>
 
         <p className="animate-fade-up-delay-2 mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-          Transforming existing AC public lighting grids into high-capacity DC infrastructure for EV charging — no cable replacement needed.
+          Transforming existing AC public lighting grids into high-capacity DC infrastructure for EV charging.
         </p>
 
         <div className="animate-fade-up-delay-3 mt-10 flex flex-wrap gap-4">
@@ -46,11 +46,10 @@ const HeroSection = () => (
         </div>
 
         {/* Stats bar */}
-        <div className="animate-fade-up-delay-3 mt-16 grid grid-cols-3 gap-6 border-t border-border pt-8 max-w-lg">
+        <div className="animate-fade-up-delay-3 mt-16 grid grid-cols-2 gap-6 border-t border-border pt-8 max-w-lg">
           {[
             { value: "9×", label: "More charging capacity needed" },
-            { value: "€100B", label: "Investment required in EU" },
-            { value: "98%", label: "Infrastructure reuse" },
+            { value: "€100B", label: "Investment projected in EU" },
           ].map((stat) => (
             <div key={stat.label}>
               <div className="text-2xl sm:text-3xl font-heading font-black text-primary">{stat.value}</div>

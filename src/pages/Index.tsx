@@ -6,8 +6,6 @@ import SolutionSection from "@/components/landing/SolutionSection";
 import ProductSection from "@/components/landing/ProductSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import BenefitsSection from "@/components/landing/BenefitsSection";
-import BusinessModelSection from "@/components/landing/BusinessModelSection";
-import RoadmapSection from "@/components/landing/RoadmapSection";
 import CTASection from "@/components/landing/CTASection";
 
 const Index = () => (
@@ -19,8 +17,6 @@ const Index = () => (
     <ProductSection />
     <HowItWorksSection />
     <BenefitsSection />
-    <BusinessModelSection />
-    <RoadmapSection />
     <CTASection />
     <Footer />
   </div>
