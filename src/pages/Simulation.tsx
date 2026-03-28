@@ -14,8 +14,7 @@ const SimulationPage = () => {
     chargerPower: 22,
   });
 
-  const update = (key: string, val: number) =>
-    setInputs((prev) => ({ ...prev, [key]: val }));
+  const update = (key: string, val: number) => setInputs((prev) => ({ ...prev, [key]: val }));
 
   const results = useMemo(() => {
     const totalLightingPower = inputs.numLuminaires * inputs.powerPerLuminaire;
@@ -27,14 +26,14 @@ const SimulationPage = () => {
     const maxDCCapacity = totalPowerAC * capacityGain;
     const infraReuse = 98;
     const costSavings = 41;
-    const traditionalCost = (inputs.cableLength * 120 + inputs.numChargers * 15000 + 80000);
+    const traditionalCost = inputs.cableLength * 120 + inputs.numChargers * 15000 + 80000;
     const evdcCost = traditionalCost * (1 - costSavings / 100);
     const savings = traditionalCost - evdcCost;
     const monthlyRevenue = inputs.numChargers * 800;
     const roiMonths = evdcCost > 0 ? Math.ceil(evdcCost / monthlyRevenue) : 0;
 
     return {
-      totalPowerAC: (totalPowerAC / 1000).toFixed(1),
+      totalPowerAC: (totalPowerAC / 10).toFixed(1),
       totalPowerDC: (totalPowerDC / 1000).toFixed(1),
       maxDCCapacity: (maxDCCapacity / 1000).toFixed(1),
       capacityGain: capacityGain.toFixed(1),
@@ -73,7 +72,9 @@ const SimulationPage = () => {
       <div className="pt-24 pb-16">
         <div className="section-container">
           <div className="text-center mb-12">
-            <span className="text-xs font-mono font-medium text-primary uppercase tracking-widest">Technical Calculator</span>
+            <span className="text-xs font-mono font-medium text-primary uppercase tracking-widest">
+              Technical Calculator
+            </span>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black mt-3">
               Grid <span className="gradient-text">Simulation</span>
             </h1>
@@ -134,7 +135,11 @@ const SimulationPage = () => {
                       <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(215 15% 55%)" }} />
                       <YAxis tick={{ fontSize: 11, fill: "hsl(215 15% 55%)" }} />
                       <Tooltip
-                        contentStyle={{ background: "hsl(220 18% 8%)", border: "1px solid hsl(220 15% 16%)", borderRadius: 8 }}
+                        contentStyle={{
+                          background: "hsl(220 18% 8%)",
+                          border: "1px solid hsl(220 15% 16%)",
+                          borderRadius: 8,
+                        }}
                         labelStyle={{ color: "hsl(210 20% 92%)" }}
                       />
                       <Legend />
@@ -152,7 +157,11 @@ const SimulationPage = () => {
                       <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(215 15% 55%)" }} />
                       <YAxis tick={{ fontSize: 11, fill: "hsl(215 15% 55%)" }} />
                       <Tooltip
-                        contentStyle={{ background: "hsl(220 18% 8%)", border: "1px solid hsl(220 15% 16%)", borderRadius: 8 }}
+                        contentStyle={{
+                          background: "hsl(220 18% 8%)",
+                          border: "1px solid hsl(220 15% 16%)",
+                          borderRadius: 8,
+                        }}
                         labelStyle={{ color: "hsl(210 20% 92%)" }}
                       />
                       <Bar dataKey="cost" fill="hsl(155 100% 45%)" radius={[4, 4, 0, 0]} />
