@@ -33,7 +33,7 @@ const SimulationPage = () => {
     const roiMonths = evdcCost > 0 ? Math.ceil(evdcCost / monthlyRevenue) : 0;
 
     return {
-      totalPowerAC: (totalPowerAC / 10).toFixed(1),
+      totalPowerAC: (totalPowerAC / 1000).toFixed(1),
       totalPowerDC: (totalPowerDC / 1000).toFixed(1),
       maxDCCapacity: (maxDCCapacity / 1000).toFixed(1),
       capacityGain: capacityGain.toFixed(1),
