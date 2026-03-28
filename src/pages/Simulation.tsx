@@ -27,13 +27,10 @@ import {
 import { Info, Calculator } from "lucide-react";
 
 const LUMINAIRE_TYPES = [
-  { value: "led-60", label: "LED 60W", power: 60 },
-  { value: "led-100", label: "LED 100W", power: 100 },
-  { value: "led-150", label: "LED 150W", power: 150 },
-  { value: "led-200", label: "LED 200W", power: 200 },
-  { value: "hps-150", label: "HPS 150W", power: 150 },
-  { value: "hps-250", label: "HPS 250W", power: 250 },
-  { value: "hps-400", label: "HPS 400W", power: 400 },
+  { value: "led", label: "LED", power: 100 },
+  { value: "mercury", label: "Mercury", power: 250 },
+  { value: "sodium", label: "Sodium", power: 150 },
+  { value: "others", label: "Others", power: 200 },
 ];
 
 interface Results {
