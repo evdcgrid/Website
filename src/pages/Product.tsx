@@ -41,7 +41,7 @@ const ProductPage = () => (
       <div className="section-container relative z-10 text-center">
         <span className="text-xs font-mono font-medium text-primary uppercase tracking-widest">Product</span>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black mt-4">
-          RACK01 / <span className="gradient-text">MasterGrid01</span>
+          <span className="gradient-text">GridMaster</span>
         </h1>
         <p className="text-muted-foreground mt-6 max-w-2xl mx-auto text-lg">
           A modular, intelligent power conversion rack that transforms any public lighting grid into a high-capacity DC network for EV charging.
@@ -52,7 +52,7 @@ const ProductPage = () => (
         <div className="rounded-xl border border-border bg-card p-4 glow-primary">
           <img
             src={rackImage}
-            alt="RACK01 / MasterGrid01 — Modular power conversion rack"
+            alt="GridMaster — Modular power conversion rack"
             className="w-full rounded-lg"
           />
         </div>

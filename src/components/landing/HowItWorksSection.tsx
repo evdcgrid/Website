@@ -4,7 +4,7 @@ const steps = [
   {
     icon: Server,
     step: "01",
-    title: "Install RACK01",
+    title: "Install GridMaster",
     desc: "Deploy the conversion rack at the LV transformation point.",
   },
   {
