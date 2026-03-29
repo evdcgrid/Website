@@ -142,10 +142,10 @@ const SimulationPage = () => {
 
   const metrics: { key: keyof ScenarioData; label: string; tooltip: string; format: (v: number) => string }[] = [
     { key: "n_chargers", label: "Number of Chargers", tooltip: "EV chargers supported by each scenario (22 kW each)", format: (v) => String(v) },
-    { key: "lights_power", label: "Power Consumption (Lighting)", tooltip: "Total power consumed by the lighting system", format: (v) => `${v.toFixed(1)} kW` },
+    { key: "lights_power", label: "Power Consumption (Lighting)", tooltip: "Total power consumed by the lighting system", format: (v) => `${v.toFixed(1)} W` },
     { key: "savings", label: "Savings in Euros (Lighting)", tooltip: "Yearly savings from reduced lighting losses", format: formatEuro },
     { key: "cost", label: "Infrastructure Cost", tooltip: "Estimated total cost including cables, converters and chargers", format: formatEuro },
-    { key: "total_energy", label: "Energy Transported", tooltip: "Effective energy delivered accounting for line losses", format: (v) => `${v.toFixed(1)} kW` },
+    { key: "total_energy", label: "Power Transported", tooltip: "Effective power delivered accounting for line losses", format: (v) => `${v.toFixed(1)} W` },
     { key: "reused_infra_pct", label: "Infrastructure Reuse", tooltip: "Percentage of existing infrastructure reused vs current case", format: (v) => `${v}%` },
   ];
 

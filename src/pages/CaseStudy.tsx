@@ -25,8 +25,8 @@ const dcItems = [
   { item: "Installation", value: 40000 },
 ];
 
-const totalAC = 132900;
-const totalDC = 96500;
+const totalAC = 132900 * 3;
+const totalDC = 116050;
 const savingsPercent = ((totalAC - totalDC) / totalAC) * 100;
 
 const fmt = (n: number) => n.toLocaleString("de-DE");
