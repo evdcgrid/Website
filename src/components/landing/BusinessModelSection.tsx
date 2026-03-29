@@ -5,7 +5,7 @@ const models = [
     icon: Server,
     title: "Hardware",
     price: "~€52k",
-    desc: "RACK01 unit with AC/DC converters, DC protections, and embedded control.",
+    desc: "GridMaster unit with AC/DC converters, DC protections, and embedded control.",
     features: ["2× 50kW converters", "Full DC protection", "Plug-and-play installation"],
   },
   {

@@ -28,7 +28,7 @@ const Footer = () => (
           <h4 className="font-semibold mb-3 text-sm">Technology</h4>
           <div className="flex flex-col gap-2 text-sm text-muted-foreground">
             <span>DC Grid Conversion</span>
-            <span>RACK01 System</span>
+            <span>GridMaster System</span>
             <span>SaaS Platform</span>
             <span>Grid Monitoring</span>
           </div>
