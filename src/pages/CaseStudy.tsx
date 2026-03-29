@@ -20,13 +20,14 @@ const acObras = [
 ];
 
 const dcItems = [
-  { item: "Rack", value: 52000 },
+  { item: "Rack", value: 104000 },
   { item: "LED Lamps", value: 4500 },
-  { item: "Installation", value: 40000 },
+  { item: "Licensing", value: 300 },
+  { item: "Installation", value: 11650 },
 ];
 
 const totalAC = 132900 * 3;
-const totalDC = 116050;
+const totalDC = 120450;
 const savingsPercent = ((totalAC - totalDC) / totalAC) * 100;
 
 const fmt = (n: number) => n.toLocaleString("de-DE");
