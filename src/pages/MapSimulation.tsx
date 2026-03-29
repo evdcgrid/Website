@@ -633,7 +633,7 @@ const MapSimulationPage = () => {
                         <div className="text-xs text-muted-foreground mb-1">Savings vs Traditional AC</div>
                         <div className="text-2xl font-heading font-black text-accent">
                           {freguesiaData.dc.investment_value_ac > 0
-                            ? ((freguesiaData.dc.investment_savings)).toFixed(1) + "%"
+                            ? ((freguesiaData.dc.investment_savings)).toFixed(0) + "€"
                             : "N/A"}
                         </div>
                       </div>
