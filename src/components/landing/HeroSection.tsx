@@ -13,11 +13,6 @@ const HeroSection = () => (
 
     <div className="section-container relative z-10 py-20">
       <div className="max-w-4xl">
-        <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 mb-8">
-          <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-          <span className="text-xs font-mono font-medium text-primary">Deep-Tech Energy Innovation</span>
-        </div>
-
         <h1 className="animate-fade-up-delay-1 text-4xl sm:text-5xl lg:text-7xl font-heading font-black leading-[1.05] tracking-tight">
           Powering the Future{" "}
           <span className="gradient-text">with the Grid</span>{" "}
