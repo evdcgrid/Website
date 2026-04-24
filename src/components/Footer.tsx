@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
-import logo from "@/assets/logo_c_white.svg";
+import logo from "@/assets/logo_c_black.svg";
 
 const Footer = () => (
   <footer className="border-t border-border bg-card py-12">
