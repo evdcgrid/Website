@@ -1,8 +1,18 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        { "type": "host", "value": "www.evdcgrid.pt" }
+      ],
+      "destination": "https://evdcgrid.pt/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
-      "has": [ { "type": "host", "value": "www.evdcgrid.pt" } ],
+      "has": [
+        { "type": "host", "value": "www.evdcgrid.pt" }
+      ],
       "destination": "https://evdcgrid.pt/:path*",
       "permanent": true
     }
