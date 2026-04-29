@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import rackImage from "@/assets/rack01-product.png";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
 import { Cpu, Shield, Zap, Radio, Globe, Gauge, BatteryCharging, CircuitBoard } from "lucide-react";
 import {
   Table,
@@ -33,6 +34,11 @@ const features = [
 
 const ProductPage = () => (
   <div className="min-h-screen bg-background text-foreground">
+    <Seo
+      title="RACK01 / MasterGrid01 product overview"
+      description="Explore the RACK01 / MasterGrid01 modular power conversion rack for public lighting grids, DC output, PLC communication and EV charging readiness."
+      path="/product"
+    />
     <Navbar />
 
     {/* Hero */}

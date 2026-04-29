@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Info, Calculator, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Seo from "@/components/Seo";
 
 const LUMINAIRE_TYPES = [
   { value: "LED", label: "LED" },
@@ -151,6 +152,11 @@ const SimulationPage = () => {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="Lighting infrastructure simulation"
+        description="Compare current, AC and DC lighting infrastructure scenarios for a grid, including estimated savings, charger count and reuse of existing infrastructure."
+        path="/simulation"
+      />
       <Navbar />
       <div className="pt-24 pb-16">
         <div className="section-container max-w-4xl mx-auto">

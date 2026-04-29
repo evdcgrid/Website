@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
 import { TrendingDown, Zap, Cable, MapPin, CheckCircle2 } from "lucide-react";
 
 const acExcavation = [
@@ -35,6 +36,11 @@ const fmt = (n: number) => n.toLocaleString("de-DE");
 const CaseStudyPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <Seo
+        title="Areeiro case study"
+        description="Read the Areeiro, Lisbon case study comparing traditional AC public lighting infrastructure with the EVDCGRID DC system and its cost savings."
+        path="/case-study"
+      />
       <Navbar />
 
       {/* Hero */}

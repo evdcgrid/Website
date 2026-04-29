@@ -8,9 +8,35 @@ import ProductSection from "@/components/landing/ProductSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import BenefitsSection from "@/components/landing/BenefitsSection";
 import CTASection from "@/components/landing/CTASection";
+import Seo from "@/components/Seo";
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "EVDCGRID",
+    url: "https://evdcgrid.com",
+    email: "info@evdcgrid.com",
+    areaServed: "Portugal",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "EVDCGRID",
+    url: "https://evdcgrid.com",
+    description:
+      "DC grid infrastructure for public lighting and EV charging across Portugal.",
+  },
+];
 
 const Index = () => (
   <div className="min-h-screen">
+    <Seo
+      title="EVDCGRID | DC grid infrastructure for public lighting and EV charging"
+      description="EVDCGRID transforms public lighting grids into DC infrastructure for EV charging, with modular power conversion, simulation tools and a municipal case study."
+      path="/"
+      structuredData={structuredData}
+    />
     <Navbar />
     <HeroSection />
     

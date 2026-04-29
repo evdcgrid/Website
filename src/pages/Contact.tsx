@@ -3,6 +3,7 @@ import { Send, Mail, Building2, User } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
 
 const ContactPage = () => {
   const [form, setForm] = useState({ name: "", email: "", company: "", message: "", pilot: false });
@@ -15,6 +16,11 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="Contact EVDCGRID"
+        description="Contact EVDCGRID to discuss a pilot project, partnership or more information about DC grid infrastructure for public lighting and EV charging."
+        path="/contact"
+      />
       <Navbar />
       <div className="pt-24 pb-16">
         <div className="section-container">

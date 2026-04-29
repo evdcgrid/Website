@@ -5,6 +5,7 @@ import type { Layer, LeafletMouseEvent, LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Seo from "@/components/Seo";
 
 type GeoJSONData = GeoJSON.FeatureCollection;
 
@@ -377,6 +378,11 @@ const MapSimulationPage = () => {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="Portugal map explorer"
+        description="Explore Portugal districts, municipalities and parishes to assess public lighting infrastructure and DC grid opportunities by location."
+        path="/map"
+      />
       <Navbar />
       <div className="pt-24 pb-16">
         <div className="section-container">
