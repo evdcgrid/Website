@@ -1,0 +1,7 @@
+/*    /index.html   200
+
+# Optional: force www -> non-www canonical redirect (uncomment to enable)
+#  https://www.evdcgrid.pt/*  https://evdcgrid.pt/:splat  301!
+
+# Optional: force non-www -> www canonical redirect (uncomment to enable)
+#  https://evdcgrid.pt/*  https://www.evdcgrid.pt/:splat  301!

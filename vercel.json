@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [ { "type": "host", "value": "www.evdcgrid.pt" } ],
+      "destination": "https://evdcgrid.pt/:path*",
+      "permanent": true
+    }
+  ]
+}
