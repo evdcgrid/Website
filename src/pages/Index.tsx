@@ -15,15 +15,15 @@ const structuredData = [
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "EVDCGRID",
-    url: "https://evdcgrid.com",
-    email: "info@evdcgrid.com",
+    url: "https://evdcgrid.pt",
+    email: "info@evdcgrid.pt",
     areaServed: "Portugal",
   },
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "EVDCGRID",
-    url: "https://evdcgrid.com",
+    url: "https://evdcgrid.pt",
     description:
       "DC grid infrastructure for public lighting and EV charging across Portugal.",
   },

@@ -36,7 +36,7 @@ const Footer = () => (
         <div>
           <h4 className="font-semibold mb-3 text-sm">Contact</h4>
           <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-            <span>info@evdcgrid.com</span>
+            <span>info@evdcgrid.pt</span>
             <span>Lisbon, Portugal</span>
           </div>
         </div>

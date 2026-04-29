@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 const SITE_NAME = "EVDCGRID";
-const SITE_URL = "https://evdcgrid.com";
+const SITE_URL = "https://evdcgrid.pt";
 const DEFAULT_IMAGE =
   "https://storage.googleapis.com/gpt-engineer-file-uploads/LUUzPPXhtnVRPBrws57FVLv6K4T2/social-images/social-1774698623137-EVDCGrid.webp";
 

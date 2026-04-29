@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://evdcgrid.com/sitemap.xml
+Sitemap: https://evdcgrid.pt/sitemap.xml

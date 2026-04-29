@@ -102,7 +102,7 @@ const ContactPage = () => {
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Mail size={14} className="text-primary" />
-                    info@evdcgrid.com
+                    info@evdcgrid.pt
                   </div>
                   <div className="flex items-center gap-2">
                     <Building2 size={14} className="text-primary" />
