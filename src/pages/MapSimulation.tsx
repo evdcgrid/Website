@@ -567,9 +567,9 @@ const MapSimulationPage = () => {
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Total Luminaires</div>
                         <div className="text-3xl font-heading font-black text-foreground">{parishData.total.total_lights.toLocaleString("de-DE")}</div>
                       </div>
-                      <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/5 p-5">
+                      <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Percentage of LEDs</div>
-                        <div className="text-3xl font-heading font-black text-emerald-600">{typeof parishData.led.led_percentage === "number" ? parishData.led.led_percentage.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%" : String(parishData.led.led_percentage).replace(".", ",")}</div>
+                        <div className="text-3xl font-heading font-black text-foreground">{typeof parishData.led.led_percentage === "number" ? parishData.led.led_percentage.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%" : String(parishData.led.led_percentage).replace(".", ",")}</div>
                       </div>
                       <div className={`rounded-lg border p-5 ${parishData.dc.led_annual_savings >= 0 ? "border-emerald-500/25 bg-emerald-500/5" : "border-destructive/30 bg-destructive/5"}`}>
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Annual LED Energy Savings</div>
@@ -594,7 +594,7 @@ const MapSimulationPage = () => {
                         <div className="text-3xl font-heading font-black text-foreground">{parishData.dc.current_chargers.toLocaleString("de-DE")}</div>
                       </div>
                       <div className="rounded-lg border border-primary/30 bg-primary/5 p-5 glow-primary">
-                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">EV Chargers with DC Solution</div>
+                        <div className="text-[0.68rem] xl:text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1 whitespace-nowrap">EV Chargers with DC Solution</div>
                         <div className="text-3xl font-heading font-black text-primary">{parishData.dc.dc_chargers.toLocaleString("de-DE")}</div>
                       </div>
                       <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/5 p-5">
@@ -638,13 +638,13 @@ const MapSimulationPage = () => {
                       <BarChart3 className="h-4 w-4" /> Financial Comparison
                     </h4>
                     <div className="grid sm:grid-cols-3 gap-4">
+                      <div className="rounded-lg border border-destructive/25 bg-destructive/5 p-5">
+                        <div className="text-[0.68rem] xl:text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1 whitespace-nowrap">Traditional AC Investment Cost</div>
+                        <div className="text-2xl font-heading font-black text-destructive">{formatEuro(parishData.dc.investment_value_ac)}</div>
+                      </div>
                       <div className="rounded-lg border border-primary/25 bg-primary/5 p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">DC Solution Investment</div>
                         <div className="text-2xl font-heading font-black text-primary">{formatEuro(parishData.dc.investment_value_dc)}</div>
-                      </div>
-                      <div className="rounded-lg border border-destructive/25 bg-destructive/5 p-5">
-                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Traditional AC Investment Cost</div>
-                        <div className="text-2xl font-heading font-black text-destructive">{formatEuro(parishData.dc.investment_value_ac)}</div>
                       </div>
                       <div className={`rounded-lg border p-5 ${investmentSavings >= 0 ? "border-emerald-500/25 bg-emerald-500/5" : "border-destructive/30 bg-destructive/5"}`}>
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Savings vs Traditional AC</div>

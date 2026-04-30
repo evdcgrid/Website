@@ -4,31 +4,46 @@ import Seo from "@/components/Seo";
 import { TrendingDown, Zap, Cable, MapPin, CheckCircle2 } from "lucide-react";
 
 const acExcavation = [
-  { item: "Mechanical Excavation", range: "25€ - 40€/m³", value: "25€/m³" },
-  { item: "Trench Opening & Closing (Urban)", range: "80€ - 120€", value: "80€" },
-  { item: "Cabling & Piping", range: "20€ - 30€", value: "20€" },
-  { item: "Labour & Licensing", range: "150€ - 200€/m", value: "150€/m" },
-  { item: "Distance", range: "400 - 800m", value: "400m" },
+  { item: "Mechanical Excavation", range: "25€ - 40€/m³", value: "33€/m³" },
+  { item: "Trench Opening & Closing (Urban)", range: "80€ - 120€", value: "100€/m" },
+  { item: "Cabling & Piping", range: "20€ - 30€", value: "25€/m" },
+  { item: "Labour & Licensing", range: "150€ - 200€/m", value: "175€/m" },
+  { item: "Distance", range: "500 - 1000m", value: "750m" },
 ];
+
+const parseAmount = (value: string) => Number.parseFloat(value.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
+const distanceMeters = parseAmount(acExcavation.find((item) => item.item === "Distance")?.value ?? "0m");
+
+const acWorks = acExcavation.reduce((sum, item) => {
+  if (item.item === "Distance") return sum;
+
+  const amount = parseAmount(item.value);
+  const isDistanceBased = item.value.includes("€/m");
+
+  return sum + (isDistanceBased ? amount * distanceMeters : amount);
+}, 0);
 
 const acObras = [
-  { item: "Project Design", value: 2500 },
-  { item: "Licensing", value: 400 },
-  { item: "QGBT Output", value: 2500 },
-  { item: "AIP", value: 2500 },
-  { item: "Construction", value: 15000 },
-  { item: "Installation", value: 22900 },
+  { item: "Project Design", value: 3750 },
+  { item: "Licensing", value: 700 },
+  { item: "QGBT Output", value: 3750 },
+  { item: "AIP", value: 3000 },
+  { item: "Construction", value: 17500 },
 ];
+
+const acInstallation = acObras.reduce((sum, item) => sum + item.value, 0); // 346500;
 
 const dcItems = [
-  { item: "Rack", value: 104000 },
-  { item: "LED Lamps", value: 4500 },
-  { item: "Licensing", value: 300 },
-  { item: "Installation", value: 11650 },
+  { item: "Rack", value: 30000 + 86940 },
+  { item: "Rack Installation", value: 5000 },
+  { item: "LED Lamps", value: 25000 },
+  { item: "Lamp Installation", value: 7000 },
+  { item: "Licensing", value: 1000 },
+  { item: "Insurance", value: 4000 },
 ];
 
-const totalAC = 132900 * 3;
-const totalDC = 120450;
+const totalAC = acWorks + acObras.reduce((sum, item) => sum + item.value, 0); // 346500;
+const totalDC = dcItems.reduce((sum, item) => sum + item.value, 0); //158940
 const savingsPercent = ((totalAC - totalDC) / totalAC) * 100;
 
 const fmt = (n: number) => n.toLocaleString("de-DE");
@@ -108,10 +123,10 @@ const CaseStudyPage = () => {
               </div>
             </div>
 
-            {/* Excavation */}
+            {/* Works */}
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="px-5 py-3 border-b border-border bg-secondary/30">
-                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Excavation</h3>
+                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Works</h3>
               </div>
               <div className="divide-y divide-border">
                 {acExcavation.map((row) => (
@@ -125,15 +140,15 @@ const CaseStudyPage = () => {
                 ))}
                 <div className="flex items-center justify-between px-5 py-3 bg-secondary/20">
                   <span className="text-sm font-semibold text-foreground">Works Subtotal</span>
-                  <span className="font-mono font-bold text-foreground">{fmt(110000)} €</span>
+                  <span className="font-mono font-bold text-foreground">{fmt(acWorks)} €</span>
                 </div>
               </div>
             </div>
 
-            {/* Works */}
+            {/* Installation */}
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="px-5 py-3 border-b border-border bg-secondary/30">
-                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Works & Installation</h3>
+                <h3 className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">Installation</h3>
               </div>
               <div className="divide-y divide-border">
                 {acObras.map((row) => (
@@ -142,6 +157,10 @@ const CaseStudyPage = () => {
                     <span className="font-mono font-semibold text-foreground">{fmt(row.value)} €</span>
                   </div>
                 ))}
+                <div className="flex items-center justify-between px-5 py-3 bg-secondary/20">
+                  <span className="text-sm font-semibold text-foreground">Installation Subtotal</span>
+                  <span className="font-mono font-bold text-foreground">{fmt(acInstallation)} €</span>
+                </div>
               </div>
             </div>
 
