@@ -6,6 +6,10 @@ import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
+import {
+  fetchFreguesiaLightingSimulation as fetchParishLightingSimulation,
+  type FreguesiaData as ParishData,
+} from "@/lib/eredesLighting";
 
 type GeoJSONData = GeoJSON.FeatureCollection;
 
@@ -167,68 +171,56 @@ const MapSimulationPage = () => {
     };
   }, [selectedDistrict, selectedMunicipality]);
 
-  interface FreguesiaData {
-    total: { total_lights: number };
-    led: { led_percentage: number };
-    dc: {
-      current_chargers: number;
-      dc_chargers: number;
-      ac_power: number;
-      dc_power: number;
-      number_of_racks: number;
-      led_annual_savings: number;
-      investment_value_dc: number;
-      investment_value_ac: number;
-      investment_savings: number;
-    };
-  }
-
-  const [freguesiaData, setFreguesiaData] = useState<FreguesiaData | null>(null);
-  const [loadingFreguesiaData, setLoadingFreguesiaData] = useState(false);
-  const [freguesiaError, setFreguesiaError] = useState<string | null>(null);
+  const [parishData, setParishData] = useState<ParishData | null>(null);
+  const [loadingParishData, setLoadingParishData] = useState(false);
+  const [parishError, setParishError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!selectedParish) {
-      setFreguesiaData(null);
-      setFreguesiaError(null);
+    if (!selectedDistrict || !selectedMunicipality || !selectedParish) {
+      setParishData(null);
+      setParishError(null);
       return;
     }
     let active = true;
     const controller = new AbortController();
 
-    setLoadingFreguesiaData(true);
-    setFreguesiaData(null);
-    setFreguesiaError(null);
+    setLoadingParishData(true);
+    setParishData(null);
+    setParishError(null);
 
-    fetch("https://diogo-guerreiro.app.n8n.cloud/webhook/evdc-grid-freguesias", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ freguesia: selectedParish }),
+    fetchParishLightingSimulation({
+      district: selectedDistrict,
+      municipality: selectedMunicipality,
+      parish: selectedParish,
       signal: controller.signal,
     })
-      .then((r) => {
-        if (!r.ok) throw new Error("Backend error");
-        return r.json();
-      })
       .then((data) => {
         if (!active) return;
-        setFreguesiaData(data[0]);
-        setLoadingFreguesiaData(false);
+        setParishData(data);
+        setLoadingParishData(false);
       })
       .catch((err) => {
         if (!active || err?.name === "AbortError") return;
-        setFreguesiaError("Erro ao carregar dados. Tenta novamente.");
-        setLoadingFreguesiaData(false);
+        setParishError("Error loading data. Please try again.");
+        setLoadingParishData(false);
       });
 
     return () => {
       active = false;
       controller.abort();
     };
-  }, [selectedParish]);
+  }, [selectedDistrict, selectedMunicipality, selectedParish]);
 
   const formatEuro = (value: number) =>
     value.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " €";
+
+  const formatPercent = (value: number) =>
+    value.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + "%";
+
+  const chargerIncrease = parishData ? parishData.dc.dc_chargers - parishData.dc.current_chargers : 0;
+  const chargerIncreasePercent =
+    parishData && parishData.dc.current_chargers > 0 ? (chargerIncrease / parishData.dc.current_chargers) * 100 : null;
+  const investmentSavings = parishData ? parishData.dc.investment_savings : 0;
 
   // District layer handlers
   const onEachDistrict = useCallback(
@@ -396,9 +388,9 @@ const MapSimulationPage = () => {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-8 items-stretch">
             {/* Map + info */}
-            <div className="lg:col-span-1 space-y-4">
+            <div className="lg:col-span-1 flex flex-col gap-4">
               {/* Breadcrumb */}
               <div className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap min-h-[1.5rem]">
                 <button onClick={resetSelection} className="hover:text-primary transition-colors font-medium">
@@ -435,7 +427,7 @@ const MapSimulationPage = () => {
               </div>
 
               {/* Map */}
-              <div className="rounded-lg border border-border overflow-hidden h-[420px]">
+              <div className="rounded-lg border border-border overflow-hidden h-[420px] lg:h-auto lg:min-h-[600px] lg:flex-1">
                 <MapContainer
                   center={[39.6, -8.0]}
                   zoom={7}
@@ -487,20 +479,20 @@ const MapSimulationPage = () => {
               <div className="rounded-lg border border-border bg-card p-4">
                 {currentStep === "district" && (
                   <p className="text-sm text-muted-foreground text-center">
-                    👆 Clica num <span className="text-primary font-medium">distrito</span> no mapa
+                    👆 Click a <span className="text-primary font-medium">district</span> on the map
                   </p>
                 )}
                 {currentStep === "municipality" && (
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground">
-                      Distrito: <span className="text-primary font-medium">{selectedDistrict}</span>
+                      District: <span className="text-primary font-medium">{selectedDistrict}</span>
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      👆 Agora clica num <span className="text-[hsl(35,80%,50%)] font-medium">concelho</span>
+                      👆 Now click a <span className="text-[hsl(35,80%,50%)] font-medium">municipality</span>
                     </p>
                     {loadingMunis && (
                       <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
-                        <Loader2 className="h-3 w-3 animate-spin" /> A carregar concelhos...
+                        <Loader2 className="h-3 w-3 animate-spin" /> Loading municipalities...
                       </div>
                     )}
                   </div>
@@ -511,11 +503,11 @@ const MapSimulationPage = () => {
                       {selectedDistrict} → <span className="text-[hsl(35,80%,50%)] font-medium">{selectedMunicipality}</span>
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      👆 Agora clica numa <span className="text-[hsl(270,60%,65%)] font-medium">freguesia</span>
+                      👆 Now click a <span className="text-[hsl(270,60%,65%)] font-medium">parish</span>
                     </p>
                     {loadingParishes && (
                       <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
-                        <Loader2 className="h-3 w-3 animate-spin" /> A carregar freguesias...
+                        <Loader2 className="h-3 w-3 animate-spin" /> Loading parishes...
                       </div>
                     )}
                   </div>
@@ -525,7 +517,7 @@ const MapSimulationPage = () => {
                     <p className="text-sm font-medium text-primary">{selectedParish}</p>
                     <p className="text-xs text-muted-foreground">{selectedMunicipality}, {selectedDistrict}</p>
                     <button onClick={resetSelection} className="mt-2 text-xs text-primary hover:underline">
-                      Nova pesquisa
+                      New search
                     </button>
                   </div>
                 )}
@@ -535,27 +527,34 @@ const MapSimulationPage = () => {
             {/* Results dashboard */}
             <div className="lg:col-span-2 relative">
               {/* Loading overlay */}
-              {loadingFreguesiaData && (
+              {loadingParishData && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-sm rounded-lg">
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">A carregar dados da freguesia...</p>
+                    <p className="text-sm text-muted-foreground">Loading parish data...</p>
                   </div>
                 </div>
               )}
 
-              {freguesiaError && (
+              {parishError && (
                 <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
-                  <p className="text-sm text-destructive">{freguesiaError}</p>
+                  <p className="text-sm text-destructive">{parishError}</p>
                 </div>
               )}
 
-              {freguesiaData && selectedParish ? (
+              {parishData && selectedParish ? (
                 <div className="space-y-6">
                   {/* Header */}
                   <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 glow-primary">
-                    <h3 className="font-heading font-bold text-lg">{selectedParish}</h3>
-                    <p className="text-sm text-muted-foreground">{selectedMunicipality}, {selectedDistrict} · Portugal</p>
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div>
+                        <h3 className="font-heading font-bold text-xl">{selectedParish}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">{selectedMunicipality}, {selectedDistrict} · Portugal</p>
+                      </div>
+                      <div className="self-start rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-mono font-medium text-primary">
+                        E-REDES data · {parishData.period.label}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Lighting Overview */}
@@ -563,14 +562,23 @@ const MapSimulationPage = () => {
                     <h4 className="text-sm font-mono font-medium text-accent uppercase tracking-widest mb-3 flex items-center gap-2">
                       <Lightbulb className="h-4 w-4" /> Lighting Overview
                     </h4>
-                    <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-3 gap-4">
                       <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Total Luminaires</div>
-                        <div className="text-2xl font-heading font-black">{freguesiaData.total.total_lights.toLocaleString("de-DE")}</div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Total Luminaires</div>
+                        <div className="text-3xl font-heading font-black text-foreground">{parishData.total.total_lights.toLocaleString("de-DE")}</div>
                       </div>
-                      <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Percentage of LEDs</div>
-                        <div className="text-2xl font-heading font-black">{typeof freguesiaData.led.led_percentage === "number" ? freguesiaData.led.led_percentage.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%" : String(freguesiaData.led.led_percentage).replace(".", ",")}</div>
+                      <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/5 p-5">
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Percentage of LEDs</div>
+                        <div className="text-3xl font-heading font-black text-emerald-600">{typeof parishData.led.led_percentage === "number" ? parishData.led.led_percentage.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%" : String(parishData.led.led_percentage).replace(".", ",")}</div>
+                      </div>
+                      <div className={`rounded-lg border p-5 ${parishData.dc.led_annual_savings >= 0 ? "border-emerald-500/25 bg-emerald-500/5" : "border-destructive/30 bg-destructive/5"}`}>
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Annual LED Energy Savings</div>
+                        <div className={`text-3xl font-heading font-black ${parishData.dc.led_annual_savings >= 0 ? "text-emerald-600" : "text-destructive"}`}>
+                          {parishData.dc.led_annual_savings >= 0 ? formatEuro(parishData.dc.led_annual_savings) : `-${formatEuro(Math.abs(parishData.dc.led_annual_savings))}`}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {Math.round(parishData.dc.current_non_led_power).toLocaleString("de-DE")} kW non-LED → {Math.round(parishData.dc.converted_non_led_power).toLocaleString("de-DE")} kW LED
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -582,16 +590,23 @@ const MapSimulationPage = () => {
                     </h4>
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Current EV Chargers (Now)</div>
-                        <div className="text-2xl font-heading font-black">{freguesiaData.dc.current_chargers.toLocaleString("de-DE")}</div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">AC Chargers Possible Now</div>
+                        <div className="text-3xl font-heading font-black text-foreground">{parishData.dc.current_chargers.toLocaleString("de-DE")}</div>
                       </div>
-                      <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">EV Chargers with DC Solution</div>
-                        <div className="text-2xl font-heading font-black text-primary">{freguesiaData.dc.dc_chargers.toLocaleString("de-DE")}</div>
+                      <div className="rounded-lg border border-primary/30 bg-primary/5 p-5 glow-primary">
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">EV Chargers with DC Solution</div>
+                        <div className="text-3xl font-heading font-black text-primary">{parishData.dc.dc_chargers.toLocaleString("de-DE")}</div>
                       </div>
-                      <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Increase in Chargers</div>
-                        <div className="text-2xl font-heading font-black text-accent">+{(freguesiaData.dc.dc_chargers - freguesiaData.dc.current_chargers).toLocaleString("de-DE")}</div>
+                      <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/5 p-5">
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Increase in Chargers</div>
+                        <div className="text-3xl font-heading font-black text-emerald-600">
+                          +{chargerIncrease.toLocaleString("de-DE")}
+                        </div>
+                        {chargerIncreasePercent !== null && (
+                          <div className="mt-2 inline-flex rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                            +{formatPercent(chargerIncreasePercent)}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -601,22 +616,18 @@ const MapSimulationPage = () => {
                     <h4 className="text-sm font-mono font-medium text-accent uppercase tracking-widest mb-3 flex items-center gap-2">
                       <Server className="h-4 w-4" /> Power & Infrastructure
                     </h4>
-                    <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-3 gap-4">
                       <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Current AC Power Available</div>
-                        <div className="text-2xl font-heading font-black">{Math.round(freguesiaData.dc.ac_power).toLocaleString("de-DE")} kW</div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Current AC Power Available</div>
+                        <div className="text-2xl font-heading font-black text-foreground">{Math.round(parishData.dc.ac_power).toLocaleString("de-DE")} kW</div>
+                      </div>
+                      <div className="rounded-lg border border-primary/25 bg-primary/5 p-5">
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Additional DC Power Capacity</div>
+                        <div className="text-2xl font-heading font-black text-primary">{Math.round(parishData.dc.dc_power).toLocaleString("de-DE")} kW</div>
                       </div>
                       <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Additional DC Power Capacity</div>
-                        <div className="text-2xl font-heading font-black text-primary">{Math.round(freguesiaData.dc.dc_power).toLocaleString("de-DE")} kW</div>
-                      </div>
-                      <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Number of Racks Required</div>
-                        <div className="text-2xl font-heading font-black">{freguesiaData.dc.number_of_racks.toLocaleString("de-DE")}</div>
-                      </div>
-                      <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Annual LED Energy Savings</div>
-                        <div className="text-2xl font-heading font-black text-accent">{formatEuro(freguesiaData.dc.led_annual_savings)}</div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Number of Racks Required</div>
+                        <div className="text-2xl font-heading font-black text-foreground">{parishData.dc.number_of_racks.toLocaleString("de-DE")}</div>
                       </div>
                     </div>
                   </div>
@@ -627,33 +638,33 @@ const MapSimulationPage = () => {
                       <BarChart3 className="h-4 w-4" /> Financial Comparison
                     </h4>
                     <div className="grid sm:grid-cols-3 gap-4">
-                      <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">DC Solution Investment</div>
-                        <div className="text-2xl font-heading font-black text-primary">{formatEuro(freguesiaData.dc.investment_value_dc)}</div>
+                      <div className="rounded-lg border border-primary/25 bg-primary/5 p-5">
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">DC Solution Investment</div>
+                        <div className="text-2xl font-heading font-black text-primary">{formatEuro(parishData.dc.investment_value_dc)}</div>
                       </div>
-                      <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Traditional AC Investment Cost</div>
-                        <div className="text-2xl font-heading font-black">{formatEuro(freguesiaData.dc.investment_value_ac)}</div>
+                      <div className="rounded-lg border border-destructive/25 bg-destructive/5 p-5">
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Traditional AC Investment Cost</div>
+                        <div className="text-2xl font-heading font-black text-destructive">{formatEuro(parishData.dc.investment_value_ac)}</div>
                       </div>
-                      <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="text-xs text-muted-foreground mb-1">Savings vs Traditional AC</div>
-                        <div className="text-2xl font-heading font-black text-accent">
-                          {freguesiaData.dc.investment_value_ac > 0
-                            ? formatEuro(freguesiaData.dc.investment_savings)
+                      <div className={`rounded-lg border p-5 ${investmentSavings >= 0 ? "border-emerald-500/25 bg-emerald-500/5" : "border-destructive/30 bg-destructive/5"}`}>
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Savings vs Traditional AC</div>
+                        <div className={`text-2xl font-heading font-black ${investmentSavings >= 0 ? "text-emerald-600" : "text-destructive"}`}>
+                          {parishData.dc.investment_value_ac > 0
+                            ? formatEuro(parishData.dc.investment_savings)
                             : "N/A"}
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              ) : !loadingFreguesiaData && !freguesiaError ? (
+              ) : !loadingParishData && !parishError ? (
                 <div className="flex items-center justify-center h-full rounded-lg border border-dashed border-border bg-card/50 p-16">
                   <div className="text-center">
                     <MapPin className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                     <p className="text-muted-foreground">
-                      {currentStep === "district" && "Seleciona um distrito no mapa"}
-                      {currentStep === "municipality" && "Seleciona um concelho no mapa"}
-                      {currentStep === "parish" && "Seleciona uma freguesia no mapa"}
+                      {currentStep === "district" && "Select a district on the map"}
+                      {currentStep === "municipality" && "Select a municipality on the map"}
+                      {currentStep === "parish" && "Select a parish on the map"}
                     </p>
                   </div>
                 </div>
