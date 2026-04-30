@@ -1,3 +1,5 @@
+import { totalAC, totalDC } from "@/lib/caseStudyCosts";
+
 const EREDES_PUBLIC_LIGHTING_API =
   "https://e-redes.opendatasoft.com/api/explore/v2.1/catalog/datasets/cadastro_iluminacao_publica/records";
 
@@ -8,8 +10,6 @@ const LAMPS_PER_CIRCUIT = 300;
 const FALLBACK_LED_LAMP_POWER_W = 50;
 const NIGHT_HOURS_PER_YEAR = 12 * 365;
 const NIGHT_ELECTRICITY_PRICE_EUR_PER_KWH = 0.07265*2;
-const AC_CIRCUIT_COST_EUR = 346500;
-const DC_CIRCUIT_COST_EUR = 158940;
 
 interface ERedesLightingRecord {
   ano: string;
@@ -150,8 +150,8 @@ function calculateSimulation(records: ERedesLightingRecord[]): FreguesiaData {
     NIGHT_HOURS_PER_YEAR *
     NIGHT_ELECTRICITY_PRICE_EUR_PER_KWH;
   const billedCircuits = Math.ceil(circuits);
-  const investmentValueAc = billedCircuits * AC_CIRCUIT_COST_EUR;
-  const investmentValueDc = billedCircuits * DC_CIRCUIT_COST_EUR;
+  const investmentValueAc = billedCircuits * totalAC;
+  const investmentValueDc = billedCircuits * totalDC;
 
   return {
     period: {
