@@ -14,7 +14,8 @@ const structuredData = [
   {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "EVDCGRID",
+    name: "EVDCGrid",
+    alternateName: ["EV DC Grid", "EVDC Grid", "EVDCGRID", "evdc grid", "evdcgrid"],
     url: "https://evdcgrid.pt",
     email: "info@evdcgrid.pt",
     areaServed: "Portugal",
@@ -22,18 +23,19 @@ const structuredData = [
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "EVDCGRID",
+    name: "EVDCGrid",
+    alternateName: ["EV DC Grid", "EVDC Grid", "EVDCGRID", "evdc grid", "evdcgrid"],
     url: "https://evdcgrid.pt",
     description:
-      "DC grid infrastructure for public lighting and EV charging across Portugal.",
+      "EV DC Grid infrastructure for public lighting and EV charging across Portugal.",
   },
 ];
 
 const Index = () => (
   <div className="min-h-screen">
     <Seo
-      title="EVDCGRID | DC grid infrastructure for public lighting and EV charging"
-      description="EVDCGRID transforms public lighting grids into DC infrastructure for EV charging, with modular power conversion, simulation tools and a municipal case study."
+      title="EV DC Grid (EVDCGrid) | DC infrastructure for public lighting and EV charging"
+      description="EVDCGrid, also known as EV DC Grid, transforms public lighting grids into DC infrastructure for EV charging, with modular power conversion, simulation tools and a municipal case study."
       path="/"
       structuredData={structuredData}
     />

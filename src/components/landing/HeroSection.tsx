@@ -14,13 +14,13 @@ const HeroSection = () => (
     <div className="section-container relative z-10 py-20">
       <div className="max-w-4xl">
         <h1 className="animate-fade-up-delay-1 text-4xl sm:text-5xl lg:text-7xl font-heading font-black leading-[1.05] tracking-tight">
-          Powering the Future{" "}
+          Powering EV DC Grid Infrastructure{" "}
           <span className="gradient-text">with the Grid</span>{" "}
           of Today
         </h1>
 
         <p className="animate-fade-up-delay-2 mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-          Transforming existing AC public lighting grids into high-capacity DC infrastructure for EV charging.
+          EVDCGrid transforms existing AC public lighting grids into high-capacity DC infrastructure for EV charging.
         </p>
 
         <div className="animate-fade-up-delay-3 mt-10 flex flex-wrap gap-4">
