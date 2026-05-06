@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const SITE_NAME = "EVDCGRID";
+const SITE_NAME = "EVDCGrid";
 const SITE_URL = "https://evdcgrid.pt";
 const DEFAULT_IMAGE =
   "https://storage.googleapis.com/gpt-engineer-file-uploads/LUUzPPXhtnVRPBrws57FVLv6K4T2/social-images/social-1774698623137-EVDCGrid.webp";
@@ -72,7 +72,7 @@ const Seo = ({
   useEffect(() => {
     const canonicalPath = path.startsWith("/") ? path : `/${path}`;
     const canonicalUrl = new URL(canonicalPath, SITE_URL).toString();
-    const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+    const fullTitle = title.toLowerCase().includes(SITE_NAME.toLowerCase()) ? title : `${title} | ${SITE_NAME}`;
     const robots = noindex ? "noindex,nofollow" : "index,follow";
 
     document.title = fullTitle;
