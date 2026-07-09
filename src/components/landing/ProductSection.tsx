@@ -10,14 +10,14 @@ const ProductSection = () => (
           <span className="gradient-text">GridMaster</span>
         </h2>
         <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-          A modular, intelligent power conversion rack that transforms any public lighting grid into a DC-powered EV charging network.
+          A modular power conversion and control platform for turning local AC feeds into DC distribution infrastructure for lighting, charging and storage.
         </p>
         <div className="mt-8">
           <Link
-            to="/product"
+            to="/technology"
             className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 glow-primary"
           >
-            Learn More
+            Learn more about technology
             <ArrowRight size={16} />
           </Link>
         </div>

@@ -89,6 +89,11 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  .nav-container {
+    width: min(100% - 2rem, 105rem);
+    margin-inline: auto;
+  }
+
   .grid-pattern {
     background-image:
       linear-gradient(hsl(215 20% 88% / 0.6) 1px, transparent 1px),
@@ -99,6 +104,135 @@
   .circuit-line {
     background: linear-gradient(90deg, transparent, hsl(212 88% 42% / 0.35), transparent);
     height: 1px;
+  }
+
+  .hero-shell {
+    min-height: 100svh;
+    padding-top: 5.25rem;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background-color: hsl(var(--background));
+    background-position: center bottom;
+    background-size: cover;
+  }
+
+  .hero-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 38rem) minmax(40rem, 1fr);
+    align-items: center;
+    gap: clamp(2rem, 3.2vw, 3.75rem);
+    width: 100%;
+    max-width: 110rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 2vw, 2rem);
+    padding-top: clamp(2rem, 4vh, 3.5rem);
+    padding-bottom: clamp(2rem, 4vh, 3.5rem);
+  }
+
+  .hero-copy {
+    max-width: 42rem;
+  }
+
+  .hero-copy h1 {
+    color: hsl(224 72% 13%);
+    font-size: clamp(2.45rem, 3.1vw, 3.65rem);
+    font-weight: 900;
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+
+  .hero-heading-line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .hero-title-rule {
+    display: block;
+    width: 4.5rem;
+    height: 0.32rem;
+    margin-top: 2rem;
+    border-radius: 999px;
+    background: hsl(var(--primary));
+  }
+
+  .hero-copy p {
+    margin-top: 1.6rem;
+    max-width: 35rem;
+    color: hsl(224 36% 25%);
+    font-size: clamp(1rem, 1.02vw, 1.15rem);
+    line-height: 1.65;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+
+  .hero-primary-action,
+  .hero-secondary-action {
+    display: inline-flex;
+    min-width: 10.25rem;
+    height: 3.5rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border-radius: 0.45rem;
+    font-size: 0.98rem;
+    font-weight: 700;
+    transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  }
+
+  .hero-primary-action {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 18px 34px hsl(var(--primary) / 0.22);
+  }
+
+  .hero-primary-action:hover {
+    background: hsl(212 88% 38%);
+    transform: translateY(-1px);
+  }
+
+  .hero-secondary-action {
+    border: 1.5px solid hsl(var(--primary));
+    background: hsl(var(--background) / 0.78);
+    color: hsl(224 72% 16%);
+  }
+
+  .hero-secondary-action:hover {
+    background: hsl(var(--primary) / 0.06);
+  }
+
+  .hero-primary-action:focus-visible,
+  .hero-secondary-action:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+
+  .hero-diagram-card {
+    display: flex;
+    width: min(100%, 62rem);
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    overflow: hidden;
+    border: 1px solid hsl(214 58% 84%);
+    border-radius: 1rem;
+    background: hsl(0 0% 100%);
+    padding: clamp(0.45rem, 1vw, 0.85rem);
+    box-shadow: 0 24px 60px hsl(218 42% 34% / 0.14);
+  }
+
+  .hero-diagram-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: min(68svh, 43rem);
+    object-fit: contain;
+    border-radius: 0.75rem;
   }
 }
 
@@ -155,6 +289,72 @@
 @keyframes countUp {
   from { opacity: 0; transform: scale(0.5); }
   to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 1180px) {
+  .hero-layout {
+    grid-template-columns: 1fr;
+    max-width: 64rem;
+  }
+
+  .hero-copy {
+    max-width: 52rem;
+  }
+
+  .hero-diagram-card {
+    width: 100%;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 860px) {
+  .hero-shell {
+    min-height: auto;
+    padding-top: 4.5rem;
+  }
+
+  .hero-layout {
+    max-width: 46rem;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.35rem, 10vw, 3.7rem);
+  }
+
+  .hero-copy p {
+    font-size: 1rem;
+  }
+
+  .hero-actions {
+    margin-top: 2rem;
+  }
+
+  .hero-primary-action,
+  .hero-secondary-action {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hero-diagram-card {
+    padding: clamp(0.4rem, 1.4vw, 0.7rem);
+  }
+}
+
+@media (max-width: 560px) {
+  .nav-container {
+    width: min(100% - 2rem, 105rem);
+  }
+
+  .hero-diagram-card {
+    margin-inline: 0;
+    padding: 0.35rem;
+  }
+
+  .hero-heading-line {
+    white-space: normal;
+  }
 }
 
 /* Hide number input spinners */
