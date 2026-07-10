@@ -50,7 +50,7 @@ const programmes = [
     background: "#3ee3a0",
     imageAlt: "Future Innovators Program by Unicorn Factory Lisboa image",
     url: "https://www.futureinnovators.pt/",
-    type: "Competiition7",
+    type: "Competition",
   },
   {
     id: "digital-built-accelerator",
@@ -199,12 +199,6 @@ const AboutPage = () => {
                 </div>
 
                 <div className="flex flex-col justify-center p-6 sm:p-8">
-                  <img
-                    src={selectedProgramme.logo}
-                    alt={`${selectedProgramme.title} logo`}
-                    className="mb-5 h-14 w-fit max-w-[18rem] rounded-md border border-border object-contain p-2 shadow-sm"
-                    style={{ background: selectedProgramme.background }}
-                  />
                   <span className="mb-4 inline-flex w-fit rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary">
                     {selectedProgramme.type}
                   </span>

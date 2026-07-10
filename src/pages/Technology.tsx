@@ -72,7 +72,7 @@ const validationReferences = [
 const TechnologyPage = () => (
   <div className="site-page">
     <Seo
-      title="Technology"
+      title="Why DC, Why now"
       description="Why Direct Current is relevant for local electrification, and how EVDCGrid applies DC infrastructure to connect renewables, storage, lighting, EV charging and flexible loads."
       path="/technology"
     />
@@ -85,7 +85,7 @@ const TechnologyPage = () => (
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-primary">Technology</span>
           <div className="mt-5 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <h1 className="text-4xl font-black leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Why DC, Why Now
+              Why DC, Why now
             </h1>
             <p className="text-lg leading-8 text-muted-foreground">
               Many of the assets driving electrification already operate natively in DC: solar PV, batteries, electric
