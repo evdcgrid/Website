@@ -493,6 +493,11 @@
     padding: 0.35rem;
   }
 
+  .hero-diagram-label,
+  .hero-diagram-app {
+    display: none;
+  }
+
   .hero-heading-line {
     white-space: normal;
   }
