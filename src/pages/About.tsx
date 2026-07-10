@@ -3,7 +3,6 @@ import { Award, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
-import lineBackground from "@/assets/evdc-lines-vertical-corners.png";
 import diogoImage from "@/assets/founder-diogo-guerreiro.jpg";
 import luisImage from "@/assets/founder-luis-fernandes.jpg";
 import duarteImage from "@/assets/founder-duarte-domingues.png";
@@ -51,8 +50,7 @@ const programmes = [
     background: "#3ee3a0",
     imageAlt: "Future Innovators Program by Unicorn Factory Lisboa image",
     url: "https://www.futureinnovators.pt/",
-    sourceUrl: "https://lisboainnovation.com/initiative/future-innovators-program/",
-    type: "Programme",
+    type: "Competiition7",
   },
   {
     id: "digital-built-accelerator",
@@ -65,8 +63,6 @@ const programmes = [
     background: "#000000",
     imageAlt: "Digital Built Accelerator programme image",
     url: "https://www.digitalbuiltaccelerator.pt/",
-    sourceUrl:
-      "https://tecnico.ulisboa.pt/en/news/new-digital-built-acceleration-programme-opens-applications-for-construction-sector-startups/",
     type: "Accelerator",
   },
   {
@@ -80,7 +76,7 @@ const programmes = [
     background: "hsl(var(--background))",
     imageAlt: "EIT Jumpstarter Smart Cities and Urban Mobility programme image",
     url: "https://eitjumpstarter.eu/programme-details/",
-    type: "Programme",
+    type: "Accelerator",
   },
   {
     id: "urban-mobility-disruptor",
@@ -102,7 +98,7 @@ const AboutPage = () => {
   const selectedProgramme = programmes.find((programme) => programme.id === activeProgramme) ?? programmes[0];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="site-page">
       <Seo
         title="About Us"
         description="EVDCGrid was born from energy systems research, combining expertise in DC grids, power electronics, protection systems and sustainable energy infrastructure."
@@ -111,10 +107,7 @@ const AboutPage = () => {
       <Navbar />
 
       <main>
-        <section
-          className="relative overflow-hidden border-b border-border bg-background bg-cover bg-center pt-28 lg:pt-32"
-          style={{ backgroundImage: `url(${lineBackground})` }}
-        >
+        <section className="site-section-strong relative overflow-hidden border-b border-border pt-28 lg:pt-32">
           <div className="absolute inset-0 bg-gradient-to-b from-background/84 via-background/93 to-surface/92" />
           <div className="section-container relative py-16 lg:py-24">
             <span className="font-mono text-xs font-semibold uppercase tracking-widest text-primary">About Us</span>
@@ -129,7 +122,7 @@ const AboutPage = () => {
           </div>
         </section>
 
-        <section className="bg-surface py-20 lg:py-24">
+        <section className="site-section-soft py-20 lg:py-24">
           <div className="section-container">
             <h2 className="text-3xl font-black text-foreground sm:text-4xl">The Team</h2>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
@@ -153,7 +146,7 @@ const AboutPage = () => {
           </div>
         </section>
 
-        <section className="border-t border-border bg-background py-20 lg:py-24">
+        <section className="site-section border-t border-border py-20 lg:py-24">
           <div className="section-container">
             <div className="mb-10 flex items-center gap-3">
               <Award className="h-7 w-7 text-primary" />
@@ -177,10 +170,10 @@ const AboutPage = () => {
                     aria-selected={selectedProgramme.id === programme.id}
                     aria-controls={`programme-panel-${programme.id}`}
                     onClick={() => setActiveProgramme(programme.id)}
-                    className={`rounded-md border px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                    className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors focus:outline-none ${
                       selectedProgramme.id === programme.id
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:bg-secondary hover:text-foreground"
                     }`}
                   >
                     {programme.label}

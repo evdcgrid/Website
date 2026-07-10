@@ -8,7 +8,7 @@ const fmt = (n: number) => n.toLocaleString("de-DE");
 
 const CaseStudyPage = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="site-page text-foreground">
       <Seo
         title="Areeiro case study"
         description="Read the Areeiro, Lisbon case study comparing traditional AC public lighting infrastructure with the EVDCGRID DC system and its cost savings."
@@ -17,7 +17,7 @@ const CaseStudyPage = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative pt-24 pb-16 overflow-hidden">
+      <section className="site-section-strong relative overflow-hidden pb-16 pt-24">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="section-container relative z-10">
           <div className="flex items-center gap-2 text-primary mb-4">
@@ -35,7 +35,7 @@ const CaseStudyPage = () => {
       </section>
 
       {/* Key Metrics */}
-      <section className="section-container pb-16">
+      <section className="section-container pb-16 pt-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="rounded-xl border border-border bg-card p-6 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-destructive/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

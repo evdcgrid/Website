@@ -10,7 +10,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
+    <div className="site-page flex items-center justify-center">
       <Seo
         title="Page not found"
         description="The requested page could not be found on EVDCGRID. Return to the homepage or browse the available sections."

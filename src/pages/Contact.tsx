@@ -2,7 +2,6 @@ import { Mail, MapPin, MessageSquare, Handshake } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
-import lineBackground from "@/assets/evdc-lines-horizontal-1.png";
 
 const contactDetails = [
   {
@@ -25,7 +24,7 @@ const conversationTopics = [
 ];
 
 const ContactPage = () => (
-  <div className="min-h-screen bg-background">
+  <div className="site-page">
     <Seo
       title="Contact Us"
       description="Contact EVDCGrid for partnerships, pilot projects and professional discussions about DC infrastructure for local electrification."
@@ -34,10 +33,7 @@ const ContactPage = () => (
     <Navbar />
 
     <main>
-      <section
-        className="relative overflow-hidden border-b border-border bg-background bg-cover bg-center pt-28 lg:pt-32"
-        style={{ backgroundImage: `url(${lineBackground})` }}
-      >
+      <section className="site-section-strong relative overflow-hidden border-b border-border pt-28 lg:pt-32">
         <div className="absolute inset-0 bg-gradient-to-b from-background/84 via-background/93 to-surface/92" />
         <div className="section-container relative py-16 lg:py-24">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-primary">Contact Us</span>

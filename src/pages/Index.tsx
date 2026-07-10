@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BatteryCharging,
-  Gauge,
+  Euro,
   Lightbulb,
   Network,
   PlugZap,
@@ -11,8 +11,6 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
-import lineBackground from "@/assets/evdc-lines-horizontal-1.png";
-import verticalLineBackground from "@/assets/evdc-lines-vertical-blue-green.png";
 import publicLightingImage from "@/assets/project-public-lighting-city.png";
 import chargingHubImage from "@/assets/project-charging-hub-city.png";
 import energyCommunityImage from "@/assets/project-energy-community-city.png";
@@ -46,10 +44,10 @@ const valueChain = [
     Icon: PlugZap,
   },
   {
-    label: "Control",
-    title: "Manage power locally",
-    text: "Measure voltage, current and power flows closer to the point of consumption, enabling safer and more predictable operation.",
-    Icon: Gauge,
+    label: "Efficiency",
+    title: "Reduce operational costs",
+    text: "Improve total system efficiency by reducing unnecessary conversion stages, helping lower OPEX across local energy infrastructure.",
+    Icon: Euro,
   },
   {
     label: "Scale",
@@ -82,16 +80,52 @@ const projects = [
 
 const HeroDiagram = () => (
   <div className="hero-diagram-card" aria-label="DC infrastructure architecture diagram">
-    <img
-      src="/images/hero-dc-diagram.png"
-      alt="DC infrastructure diagram linking the existing AC grid, AC/DC interface, DC layer, public lighting, EV charging, storage, renewables and flexible loads."
-      className="hero-diagram-image"
-    />
+    <div className="hero-diagram-stage">
+      <img
+        src="/images/hero-dc-diagram-clean.png"
+        alt="DC infrastructure diagram linking the existing AC grid, AC/DC interface, DC layer, public lighting, EV charging, storage, renewables and flexible loads."
+        className="hero-diagram-image"
+      />
+
+      <div className="hero-diagram-label hero-diagram-label-ac">
+        <strong>EXISTING AC GRID</strong>
+        <span>Utility infrastructure [AC]</span>
+      </div>
+      <div className="hero-diagram-label hero-diagram-label-interface">
+        <strong>AC / DC INTERFACE</strong>
+        <span>Intelligent conversion & control</span>
+      </div>
+      <div className="hero-diagram-label hero-diagram-label-dc">
+        <strong>DC LAYER</strong>
+        <span>Safe, efficient, scalable local power network</span>
+      </div>
+
+      <div className="hero-diagram-app hero-diagram-app-lighting">
+        <strong>PUBLIC LIGHTING</strong>
+        <span>LED street lights & controls</span>
+      </div>
+      <div className="hero-diagram-app hero-diagram-app-charging">
+        <strong>EV CHARGING</strong>
+        <span>Fast, reliable DC charging</span>
+      </div>
+      <div className="hero-diagram-app hero-diagram-app-storage">
+        <strong>STORAGE</strong>
+        <span>Battery systems & backup power</span>
+      </div>
+      <div className="hero-diagram-app hero-diagram-app-renewables">
+        <strong>RENEWABLES</strong>
+        <span>Local solar generation</span>
+      </div>
+      <div className="hero-diagram-app hero-diagram-app-loads">
+        <strong>FLEXIBLE LOADS</strong>
+        <span>HVAC, pumps, industrial & more</span>
+      </div>
+    </div>
   </div>
 );
 
 const Index = () => (
-  <div className="min-h-screen bg-background">
+  <div className="site-page">
     <Seo
       title="EVDCGrid | DC infrastructure for the next phase of electrification"
       description="EVDCGrid develops DC-based infrastructure solutions that connect renewables, storage, public lighting, EV charging and flexible loads through resilient local energy architectures."
@@ -101,25 +135,22 @@ const Index = () => (
     <Navbar />
 
     <main>
-      <section
-        className="hero-shell"
-        style={{ backgroundImage: `linear-gradient(hsl(var(--background) / 0.9), hsl(var(--background) / 0.92)), url(${lineBackground})` }}
-      >
+      <section className="hero-shell">
         <div className="section-container hero-layout">
           <div className="hero-copy">
             <h1>
-              <span className="hero-heading-line">DC infrastructure</span>
+              <span className="hero-heading-line">DC microgrids</span>
               <span className="hero-heading-line">for the next phase</span>
-              <span className="hero-heading-line">of electrification</span>
+              <span className="hero-heading-line">of electrification.</span>
             </h1>
             <span className="hero-title-rule" />
             <p>
-              EVDCGrid develops DC-based infrastructure solutions that connect renewables, storage, public lighting, EV
-              charging and flexible loads through simpler, more efficient and more resilient local energy architectures.
+              EVDCGrid designs modular DC infrastructure that helps cities, DSOs and energy operators integrate EV
+              charging, renewables, batteries and smart loads with less conversion complexity and greater local control.
             </p>
             <div className="hero-actions">
               <Link to="/projects/dc-public-lighting-grid" className="hero-primary-action">
-                Explore projects
+                Explore DC Applications
                 <ArrowRight className="h-5 w-5" />
               </Link>
               <Link to="/about" className="hero-secondary-action">
@@ -131,15 +162,12 @@ const Index = () => (
         </div>
       </section>
 
-      <section
-        className="relative overflow-hidden bg-background bg-cover bg-center py-12 lg:py-14"
-        style={{ backgroundImage: `linear-gradient(90deg, hsl(var(--background) / 0.97), hsl(var(--background) / 0.93)), url(${verticalLineBackground})` }}
-      >
+      <section className="site-section-soft relative overflow-hidden py-12 lg:py-14">
         <div className="absolute inset-0 grid-pattern opacity-[0.18]" />
         <div className="absolute -left-16 top-16 hidden h-px w-64 bg-gradient-to-r from-transparent via-primary/25 to-transparent lg:block" />
         <div className="absolute left-0 top-28 hidden h-px w-40 bg-gradient-to-r from-transparent via-primary/20 to-transparent lg:block" />
         <div className="section-container relative">
-          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center xl:gap-12">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch xl:gap-12">
             <div className="max-w-2xl">
               <span className="inline-flex flex-col gap-2 font-mono text-xs font-bold uppercase tracking-[0.18em] text-primary">
                 Grid transformation
@@ -177,8 +205,8 @@ const Index = () => (
               </article>
             </div>
 
-            <div className="relative">
-              <div className="grid gap-4">
+            <div className="relative flex h-full items-end">
+              <div className="grid w-full gap-4 lg:ml-auto lg:max-w-[39rem]">
                 {valueChain.map(({ label, title, text, Icon }) => (
                   <article
                     key={label}
@@ -204,10 +232,7 @@ const Index = () => (
         </div>
       </section>
 
-      <section
-        className="border-y border-border bg-background bg-cover bg-center py-20 lg:py-24"
-        style={{ backgroundImage: `linear-gradient(hsl(var(--background) / 0.9), hsl(var(--background) / 0.96)), url(${lineBackground})` }}
-      >
+      <section className="site-section border-y border-border py-20 lg:py-24">
         <div className="section-container">
           <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <h2 className="max-w-2xl text-3xl font-black leading-tight text-foreground sm:text-4xl">

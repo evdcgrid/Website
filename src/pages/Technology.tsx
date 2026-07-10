@@ -1,8 +1,7 @@
-import { ExternalLink, Gauge, GitBranch, Globe, Layers3, PlugZap, Quote, ShieldCheck, Zap } from "lucide-react";
+import { Euro, ExternalLink, Gauge, Globe, Layers3, PlugZap, Quote, ShieldCheck, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
-import lineBackground from "@/assets/evdc-lines-horizontal.png";
 
 const advantages = [
   {
@@ -21,9 +20,9 @@ const advantages = [
     Icon: Layers3,
   },
   {
-    title: "Modular expansion",
-    text: "New assets can be added progressively without redesigning the entire electrical architecture.",
-    Icon: GitBranch,
+    title: "Lower OPEX",
+    text: "Higher total system efficiency and fewer unnecessary conversion stages can reduce operational energy losses and maintenance complexity.",
+    Icon: Euro,
   },
   {
     title: "Local balancing and control",
@@ -71,7 +70,7 @@ const validationReferences = [
 ];
 
 const TechnologyPage = () => (
-  <div className="min-h-screen bg-background">
+  <div className="site-page">
     <Seo
       title="Technology"
       description="Why Direct Current is relevant for local electrification, and how EVDCGrid applies DC infrastructure to connect renewables, storage, lighting, EV charging and flexible loads."
@@ -80,16 +79,13 @@ const TechnologyPage = () => (
     <Navbar />
 
     <main>
-      <section
-        className="relative overflow-hidden border-b border-border bg-background bg-cover bg-center pt-28 lg:pt-32"
-        style={{ backgroundImage: `url(${lineBackground})` }}
-      >
+      <section className="site-section-strong relative overflow-hidden border-b border-border pt-28 lg:pt-32">
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/92 to-surface/90" />
         <div className="section-container relative py-16 lg:py-24">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-primary">Technology</span>
           <div className="mt-5 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <h1 className="text-4xl font-black leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Why Direct Current?
+              Why DC, Why Now
             </h1>
             <p className="text-lg leading-8 text-muted-foreground">
               Many of the assets driving electrification already operate natively in DC: solar PV, batteries, electric
@@ -101,7 +97,7 @@ const TechnologyPage = () => (
         </div>
       </section>
 
-      <section className="bg-surface py-20 lg:py-24">
+      <section className="site-section-soft py-20 lg:py-24">
         <div className="section-container">
           <div className="grid gap-8 lg:grid-cols-[1fr_0.7fr]">
             <div>
@@ -114,7 +110,14 @@ const TechnologyPage = () => (
               </p>
             </div>
             <article className="rounded-lg border border-[#2d16d7]/30 bg-[#2d16d7] p-6 text-white shadow-[0_18px_38px_hsl(249_82%_46%/0.22)]">
-              <h3 className="text-xl font-bold text-white">Following the direction of Current/OS</h3>
+              <h3 className="flex flex-wrap items-center gap-2 text-xl font-bold text-white">
+                <span>Following the direction of</span>
+                <img
+                  src="/images/current-os-logo.png"
+                  alt="Current/OS"
+                  className="h-10 w-auto max-w-[16rem] rounded-sm px-2 py-1"
+                />
+              </h3>
               <p className="mt-4 text-sm leading-6 text-white/82">
                 Current/OS is helping define rules for safe, interoperable DC microgrids. EVDCGrid follows this direction
                 by designing DC architectures that prioritise interoperability, safety, modularity and grid-aware
@@ -134,7 +137,7 @@ const TechnologyPage = () => (
         </div>
       </section>
 
-      <section className="bg-background py-20 lg:py-24">
+      <section className="site-section py-20 lg:py-24">
         <div className="section-container">
           <div className="mb-10 max-w-2xl">
             <h2 className="text-3xl font-black text-foreground sm:text-4xl">Advantages of DC</h2>
@@ -156,7 +159,7 @@ const TechnologyPage = () => (
         </div>
       </section>
 
-      <section className="relative overflow-hidden border-t border-border bg-background py-16 lg:py-20">
+      <section className="site-section relative overflow-hidden border-t border-border py-16 lg:py-20">
         <div className="absolute inset-0 grid-pattern opacity-[0.14]" />
         <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-primary/8 blur-3xl" />
         <div className="section-container relative">
