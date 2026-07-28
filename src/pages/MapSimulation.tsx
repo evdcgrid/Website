@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { MapPin, Zap, Car, TrendingUp, ChevronRight, Loader2, Lightbulb, DollarSign, Server, BarChart3 } from "lucide-react";
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Layer, LeafletMouseEvent, LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
@@ -76,6 +77,8 @@ function FlyTo({ center, zoom }: { center: [number, number]; zoom: number }) {
 }
 
 const MapSimulationPage = () => {
+  const navigate = useNavigate();
+  const { district: districtParam, municipality: municipalityParam, parish: parishParam } = useParams();
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   const [selectedMunicipality, setSelectedMunicipality] = useState<string | null>(null);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
@@ -97,9 +100,29 @@ const MapSimulationPage = () => {
   useEffect(() => {
     fetch("/portugal_map/districts.json")
       .then((r) => r.json())
-      .then((data) => setDistrictsData(data))
+      .then((data: GeoJSONData) => {
+        setDistrictsData(data);
+        if (!districtParam) {
+          setSelectedDistrict(null);
+          setSelectedMunicipality(null);
+          setSelectedParish(null);
+          setDefaultView(true);
+          return;
+        }
+
+        const district = data.features.find(
+          (feature) => slugifyPlaceName(feature.properties?.name) === districtParam
+        );
+        if (!district) {
+          navigate("/map", { replace: true });
+          return;
+        }
+
+        setSelectedDistrict(district.properties?.name);
+        setDefaultView(false);
+      })
       .catch(console.error);
-  }, []);
+  }, [districtParam, navigate]);
 
   // Load municipalities of selected district only.
   useEffect(() => {
@@ -122,6 +145,21 @@ const MapSimulationPage = () => {
         if (!active) return;
         setFilteredMunis(data);
         setLoadingMunis(false);
+
+        if (municipalityParam) {
+          const municipality = data.features.find(
+            (feature: GeoJSON.Feature) =>
+              slugifyPlaceName(feature.properties?.name) === municipalityParam
+          );
+          if (municipality) {
+            setSelectedMunicipality(municipality.properties?.name);
+          } else {
+            navigate(`/map/${districtSlug}`, { replace: true });
+          }
+        } else {
+          setSelectedMunicipality(null);
+          setSelectedParish(null);
+        }
       })
       .catch((error) => {
         if (!active || error?.name === "AbortError") return;
@@ -133,7 +171,7 @@ const MapSimulationPage = () => {
       active = false;
       controller.abort();
     };
-  }, [selectedDistrict]);
+  }, [municipalityParam, navigate, selectedDistrict]);
 
   // Load parishes of selected municipality only.
   useEffect(() => {
@@ -158,6 +196,20 @@ const MapSimulationPage = () => {
         if (!active) return;
         setFilteredParishes(data);
         setLoadingParishes(false);
+
+        if (parishParam) {
+          const parish = data.features.find(
+            (feature: GeoJSON.Feature) =>
+              slugifyPlaceName(feature.properties?.n) === parishParam
+          );
+          if (parish) {
+            setSelectedParish(parish.properties?.n);
+          } else {
+            navigate(`/map/${districtSlug}/${muniSlug}`, { replace: true });
+          }
+        } else {
+          setSelectedParish(null);
+        }
       })
       .catch((error) => {
         if (!active || error?.name === "AbortError") return;
@@ -169,7 +221,7 @@ const MapSimulationPage = () => {
       active = false;
       controller.abort();
     };
-  }, [selectedDistrict, selectedMunicipality]);
+  }, [navigate, parishParam, selectedDistrict, selectedMunicipality]);
 
   const [parishData, setParishData] = useState<ParishData | null>(null);
   const [loadingParishData, setLoadingParishData] = useState(false);
@@ -238,6 +290,7 @@ const MapSimulationPage = () => {
           setSelectedDistrict(name);
           setSelectedMunicipality(null);
           setSelectedParish(null);
+          navigate(`/map/${slugifyPlaceName(name)}`);
           setDefaultView(false);
           const bounds = (layer as any).getBounds?.();
           if (bounds) {
@@ -249,7 +302,7 @@ const MapSimulationPage = () => {
         },
       });
     },
-    [selectedDistrict]
+    [navigate, selectedDistrict]
   );
 
   const styleDistrict = useCallback(
@@ -275,6 +328,9 @@ const MapSimulationPage = () => {
         click: () => {
           setSelectedMunicipality(name);
           setSelectedParish(null);
+          navigate(
+            `/map/${slugifyPlaceName(selectedDistrict)}/${slugifyPlaceName(name)}`
+          );
           const bounds = (layer as any).getBounds?.();
           if (bounds) {
             setZoomTargetLevel("municipality");
@@ -284,7 +340,7 @@ const MapSimulationPage = () => {
         },
       });
     },
-    [selectedMunicipality]
+    [navigate, selectedDistrict, selectedMunicipality]
   );
 
   const styleMuni = useCallback(
@@ -309,6 +365,9 @@ const MapSimulationPage = () => {
         },
         click: () => {
           setSelectedParish(name);
+          navigate(
+            `/map/${slugifyPlaceName(selectedDistrict)}/${slugifyPlaceName(selectedMunicipality)}/${slugifyPlaceName(name)}`
+          );
           const bounds = (layer as any).getBounds?.();
           if (bounds) {
             setZoomTargetLevel("parish");
@@ -317,7 +376,7 @@ const MapSimulationPage = () => {
         },
       });
     },
-    [selectedParish]
+    [navigate, selectedDistrict, selectedMunicipality, selectedParish]
   );
 
   const styleParish = useCallback(
@@ -339,6 +398,7 @@ const MapSimulationPage = () => {
     setZoomTargetLevel(null);
     setIsDistrictZooming(false);
     setIsMunicipalityZooming(false);
+    navigate("/map");
   };
 
   const onFlyBoundsDone = useCallback(() => {
@@ -367,13 +427,63 @@ const MapSimulationPage = () => {
 
   // Determine what to show in the status area
   const currentStep = !selectedDistrict ? "district" : !selectedMunicipality ? "municipality" : !selectedParish ? "parish" : "result";
+  const locationPath = [
+    "/map",
+    selectedDistrict && slugifyPlaceName(selectedDistrict),
+    selectedMunicipality && slugifyPlaceName(selectedMunicipality),
+    selectedParish && slugifyPlaceName(selectedParish),
+  ].filter(Boolean).join("/");
+  const locationName = selectedParish || selectedMunicipality || selectedDistrict;
+  const seoTitle = selectedParish
+    ? `${selectedParish}, ${selectedMunicipality} - mapa e iluminação pública`
+    : selectedMunicipality
+      ? `${selectedMunicipality}, ${selectedDistrict} - mapa por freguesia`
+      : selectedDistrict
+        ? `Distrito de ${selectedDistrict} - mapa por concelho`
+        : "Mapa de Portugal por distrito, concelho e freguesia";
+  const seoDescription = selectedParish
+    ? `Explore o mapa de ${selectedParish}, no concelho de ${selectedMunicipality}, distrito de ${selectedDistrict}, e consulte a simulação EVDCGrid para iluminação pública e carregamento elétrico.`
+    : selectedMunicipality
+      ? `Explore o concelho de ${selectedMunicipality}, distrito de ${selectedDistrict}, e selecione uma freguesia no mapa EVDCGrid.`
+      : selectedDistrict
+        ? `Explore o distrito de ${selectedDistrict} por concelho e freguesia no mapa EVDCGrid.`
+        : "Explore o mapa EVDCGrid de Portugal por distrito, concelho e freguesia e consulte oportunidades de iluminação pública e redes DC.";
+  const breadcrumbs = [
+    { name: "Mapa de Portugal", path: "/map" },
+    ...(selectedDistrict ? [{ name: selectedDistrict, path: `/map/${slugifyPlaceName(selectedDistrict)}` }] : []),
+    ...(selectedMunicipality ? [{
+      name: selectedMunicipality,
+      path: `/map/${slugifyPlaceName(selectedDistrict)}/${slugifyPlaceName(selectedMunicipality)}`,
+    }] : []),
+    ...(selectedParish ? [{ name: selectedParish, path: locationPath }] : []),
+  ];
 
   return (
     <div className="min-h-screen">
       <Seo
-        title="Portugal map explorer"
-        description="Explore Portugal districts, municipalities and parishes to assess public lighting infrastructure and DC grid opportunities by location."
-        path="/map"
+        title={seoTitle}
+        description={seoDescription}
+        path={locationPath}
+        structuredData={[
+          {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: locationName ? `Mapa EVDCGrid - ${locationName}` : "Mapa EVDCGrid de Portugal",
+            url: `https://evdcgrid.pt${locationPath}`,
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: breadcrumbs.map((item, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: item.name,
+              item: `https://evdcgrid.pt${item.path}`,
+            })),
+          },
+        ]}
       />
       <Navbar />
       <div className="pt-24 pb-16">
@@ -393,29 +503,31 @@ const MapSimulationPage = () => {
             <div className="lg:col-span-1 flex flex-col gap-4">
               {/* Breadcrumb */}
               <div className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap min-h-[1.5rem]">
-                <button onClick={resetSelection} className="hover:text-primary transition-colors font-medium">
+                <Link to="/map" onClick={resetSelection} className="hover:text-primary transition-colors font-medium">
                   Portugal
-                </button>
+                </Link>
                 {selectedDistrict && (
                   <>
                     <ChevronRight size={12} />
-                    <button
+                    <Link
+                      to={`/map/${slugifyPlaceName(selectedDistrict)}`}
                       onClick={() => { setSelectedMunicipality(null); setSelectedParish(null); setFilteredParishes(null); }}
                       className="hover:text-primary transition-colors"
                     >
                       {selectedDistrict}
-                    </button>
+                    </Link>
                   </>
                 )}
                 {selectedMunicipality && (
                   <>
                     <ChevronRight size={12} />
-                    <button
+                    <Link
+                      to={`/map/${slugifyPlaceName(selectedDistrict)}/${slugifyPlaceName(selectedMunicipality)}`}
                       onClick={() => { setSelectedParish(null); }}
                       className="hover:text-primary transition-colors"
                     >
                       {selectedMunicipality}
-                    </button>
+                    </Link>
                   </>
                 )}
                 {selectedParish && (
