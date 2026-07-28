@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { MapPin, Zap, Car, TrendingUp, ChevronRight, Loader2, Lightbulb, DollarSign, Server, BarChart3 } from "lucide-react";
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { geoJSON as createGeoJSONLayer } from "leaflet";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Layer, LeafletMouseEvent, LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -30,6 +31,10 @@ function slugifyPlaceName(value: string | null | undefined): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function getFeatureBounds(feature: GeoJSON.Feature): LatLngBoundsExpression {
+  return createGeoJSONLayer(feature).getBounds();
 }
 
 const colors = {
@@ -120,6 +125,7 @@ const MapSimulationPage = () => {
 
         setSelectedDistrict(district.properties?.name);
         setDefaultView(false);
+        setFlyBounds(getFeatureBounds(district));
       })
       .catch(console.error);
   }, [districtParam, navigate]);
@@ -153,6 +159,7 @@ const MapSimulationPage = () => {
           );
           if (municipality) {
             setSelectedMunicipality(municipality.properties?.name);
+            setFlyBounds(getFeatureBounds(municipality));
           } else {
             navigate(`/map/${districtSlug}`, { replace: true });
           }
@@ -204,6 +211,7 @@ const MapSimulationPage = () => {
           );
           if (parish) {
             setSelectedParish(parish.properties?.n);
+            setFlyBounds(getFeatureBounds(parish));
           } else {
             navigate(`/map/${districtSlug}/${muniSlug}`, { replace: true });
           }
