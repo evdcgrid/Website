@@ -510,7 +510,7 @@
 
     "@vitest/utils": ["@vitest/utils@3.2.4", "", { "dependencies": { "@vitest/pretty-format": "3.2.4", "loupe": "^3.1.4", "tinyrainbow": "^2.0.0" } }, "sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA=="],
 
-    "@xmldom/xmldom": ["@xmldom/xmldom@0.8.3", "", {}, "sha512-Lv2vySXypg4nfa51LY1nU8yDAGo/5YwF+EY/rUZgIbfvwVARcd67ttCM8SMsTeJy51YhHYavEq+FS6R0hW9PFQ=="],
+    "@xmldom/xmldom": ["@xmldom/xmldom@0.8.14", "", {}, "sha512-T4EDRUBVZYRldYApjEJiU0e1stYWaRAX7CuSnKzrpwdZKo53zGV8/pqfzV6FfwNl9YThD2OumQYvqtvjvgG7aQ=="],
 
     "JSONStream": ["JSONStream@0.8.0", "", { "dependencies": { "jsonparse": "0.0.5", "through": "~2.2.7" } }, "sha512-PiV28BpoUorz9kKFwRbD7+wg0t/k0ITHKn0DgCU44YZ/GaGAZRPt9q5PzoifC85gE55SEPIdMu0Labfxevj8cw=="],
 
@@ -880,7 +880,7 @@
 
     "osm-polygon-features": ["osm-polygon-features@0.9.2", "", {}, "sha512-5zNEFCq+G6X2TDkqbKYLF1+GtWVCCLA8zX+FVhSogsiTRsGquyaGRy5cYNW4BE3ci0MKOLvNTkFNsjsCNtgz0A=="],
 
-    "osmtogeojson": ["osmtogeojson@3.0.0-beta.5", "", { "dependencies": { "@mapbox/geojson-rewind": "0.5.2", "@xmldom/xmldom": "0.8.3", "JSONStream": "0.8.0", "concat-stream": "2.0.0", "geojson-numeric": "0.2.1", "htmlparser2": "3.5.1", "optimist": "~0.3.5", "osm-polygon-features": "^0.9.1", "tiny-osmpbf": "^0.1.0" }, "optionalDependencies": { "@types/geojson": "^7946.0" }, "bin": "osmtogeojson" }, "sha512-izvaUWnunrYvMB4LB0ZN15O1+g90c628yHS4SeSR3daVSBF9vdTHL7iVHfg0wEr1uEYjQ+lMJHCiYFusL5yKVg=="],
+    "osmtogeojson": ["osmtogeojson@3.0.0-beta.5", "", { "dependencies": { "@mapbox/geojson-rewind": "0.5.2", "@xmldom/xmldom": "0.8.14", "JSONStream": "0.8.0", "concat-stream": "2.0.0", "geojson-numeric": "0.2.1", "htmlparser2": "3.5.1", "optimist": "~0.3.5", "osm-polygon-features": "^0.9.1", "tiny-osmpbf": "^0.1.0" }, "optionalDependencies": { "@types/geojson": "^7946.0" }, "bin": "osmtogeojson" }, "sha512-izvaUWnunrYvMB4LB0ZN15O1+g90c628yHS4SeSR3daVSBF9vdTHL7iVHfg0wEr1uEYjQ+lMJHCiYFusL5yKVg=="],
 
     "p-limit": ["p-limit@3.1.0", "", { "dependencies": { "yocto-queue": "^0.1.0" } }, "sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ=="],
 
