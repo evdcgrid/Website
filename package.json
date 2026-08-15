@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
+    "generate:eredes-cache": "node scripts/generate-eredes-aggregates.mjs",
     "fetch:distritos": "node scripts/fetch-distritos-api.mjs",
     "fetch:concelhos": "node scripts/fetch-concelhos-api.mjs",
     "fetch:freguesias": "node scripts/fetch-freguesias-api.mjs",
