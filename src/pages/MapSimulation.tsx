@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { MapPin, Zap, Car, TrendingUp, ChevronRight, Loader2, Lightbulb, DollarSign, Server, BarChart3 } from "lucide-react";
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { geoJSON as createGeoJSONLayer } from "leaflet";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Layer, LeafletMouseEvent, LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
@@ -29,6 +31,10 @@ function slugifyPlaceName(value: string | null | undefined): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function getFeatureBounds(feature: GeoJSON.Feature): LatLngBoundsExpression {
+  return createGeoJSONLayer(feature).getBounds();
 }
 
 const colors = {
@@ -76,6 +82,8 @@ function FlyTo({ center, zoom }: { center: [number, number]; zoom: number }) {
 }
 
 const MapSimulationPage = () => {
+  const navigate = useNavigate();
+  const { district: districtParam, municipality: municipalityParam, parish: parishParam } = useParams();
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   const [selectedMunicipality, setSelectedMunicipality] = useState<string | null>(null);
   const [selectedParish, setSelectedParish] = useState<string | null>(null);
@@ -97,9 +105,32 @@ const MapSimulationPage = () => {
   useEffect(() => {
     fetch("/portugal_map/districts.json")
       .then((r) => r.json())
-      .then((data) => setDistrictsData(data))
+      .then((data: GeoJSONData) => {
+        setDistrictsData(data);
+        if (!districtParam) {
+          setSelectedDistrict(null);
+          setSelectedMunicipality(null);
+          setSelectedParish(null);
+          setDefaultView(true);
+          return;
+        }
+
+        const district = data.features.find(
+          (feature) => slugifyPlaceName(feature.properties?.name) === districtParam
+        );
+        if (!district) {
+          navigate("/map", { replace: true });
+          return;
+        }
+
+        setSelectedDistrict(district.properties?.name);
+        setDefaultView(false);
+        if (!municipalityParam && !parishParam) {
+          setFlyBounds(getFeatureBounds(district));
+        }
+      })
       .catch(console.error);
-  }, []);
+  }, [districtParam, navigate]);
 
   // Load municipalities of selected district only.
   useEffect(() => {
@@ -122,6 +153,24 @@ const MapSimulationPage = () => {
         if (!active) return;
         setFilteredMunis(data);
         setLoadingMunis(false);
+
+        if (municipalityParam) {
+          const municipality = data.features.find(
+            (feature: GeoJSON.Feature) =>
+              slugifyPlaceName(feature.properties?.name) === municipalityParam
+          );
+          if (municipality) {
+            setSelectedMunicipality(municipality.properties?.name);
+            if (!parishParam) {
+              setFlyBounds(getFeatureBounds(municipality));
+            }
+          } else {
+            navigate(`/map/${districtSlug}`, { replace: true });
+          }
+        } else {
+          setSelectedMunicipality(null);
+          setSelectedParish(null);
+        }
       })
       .catch((error) => {
         if (!active || error?.name === "AbortError") return;
@@ -133,7 +182,7 @@ const MapSimulationPage = () => {
       active = false;
       controller.abort();
     };
-  }, [selectedDistrict]);
+  }, [municipalityParam, navigate, selectedDistrict]);
 
   // Load parishes of selected municipality only.
   useEffect(() => {
@@ -158,6 +207,21 @@ const MapSimulationPage = () => {
         if (!active) return;
         setFilteredParishes(data);
         setLoadingParishes(false);
+
+        if (parishParam) {
+          const parish = data.features.find(
+            (feature: GeoJSON.Feature) =>
+              slugifyPlaceName(feature.properties?.n) === parishParam
+          );
+          if (parish) {
+            setSelectedParish(parish.properties?.n);
+            setFlyBounds(getFeatureBounds(parish));
+          } else {
+            navigate(`/map/${districtSlug}/${muniSlug}`, { replace: true });
+          }
+        } else {
+          setSelectedParish(null);
+        }
       })
       .catch((error) => {
         if (!active || error?.name === "AbortError") return;
@@ -169,40 +233,35 @@ const MapSimulationPage = () => {
       active = false;
       controller.abort();
     };
-  }, [selectedDistrict, selectedMunicipality]);
+  }, [navigate, parishParam, selectedDistrict, selectedMunicipality]);
 
-  const [parishData, setParishData] = useState<ParishData | null>(null);
-  const [loadingParishData, setLoadingParishData] = useState(false);
-  const [parishError, setParishError] = useState<string | null>(null);
+  const [locationData, setLocationData] = useState<ParishData | null>(null);
+  const [loadingLocationData, setLoadingLocationData] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!selectedDistrict || !selectedMunicipality || !selectedParish) {
-      setParishData(null);
-      setParishError(null);
-      return;
-    }
     let active = true;
     const controller = new AbortController();
 
-    setLoadingParishData(true);
-    setParishData(null);
-    setParishError(null);
+    setLoadingLocationData(true);
+    setLocationData(null);
+    setLocationError(null);
 
     fetchParishLightingSimulation({
-      district: selectedDistrict,
-      municipality: selectedMunicipality,
-      parish: selectedParish,
+      district: selectedDistrict || undefined,
+      municipality: selectedMunicipality || undefined,
+      parish: selectedParish || undefined,
       signal: controller.signal,
     })
       .then((data) => {
         if (!active) return;
-        setParishData(data);
-        setLoadingParishData(false);
+        setLocationData(data);
+        setLoadingLocationData(false);
       })
       .catch((err) => {
         if (!active || err?.name === "AbortError") return;
-        setParishError("Error loading data. Please try again.");
-        setLoadingParishData(false);
+        setLocationError("Error loading data. Please try again.");
+        setLoadingLocationData(false);
       });
 
     return () => {
@@ -217,10 +276,10 @@ const MapSimulationPage = () => {
   const formatPercent = (value: number) =>
     value.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + "%";
 
-  const chargerIncrease = parishData ? parishData.dc.dc_chargers - parishData.dc.current_chargers : 0;
+  const chargerIncrease = locationData ? locationData.dc.dc_chargers - locationData.dc.current_chargers : 0;
   const chargerIncreasePercent =
-    parishData && parishData.dc.current_chargers > 0 ? (chargerIncrease / parishData.dc.current_chargers) * 100 : null;
-  const investmentSavings = parishData ? parishData.dc.investment_savings : 0;
+    locationData && locationData.dc.current_chargers > 0 ? (chargerIncrease / locationData.dc.current_chargers) * 100 : null;
+  const investmentSavings = locationData ? locationData.dc.investment_savings : 0;
 
   // District layer handlers
   const onEachDistrict = useCallback(
@@ -238,6 +297,7 @@ const MapSimulationPage = () => {
           setSelectedDistrict(name);
           setSelectedMunicipality(null);
           setSelectedParish(null);
+          navigate(`/map/${slugifyPlaceName(name)}`);
           setDefaultView(false);
           const bounds = (layer as any).getBounds?.();
           if (bounds) {
@@ -249,7 +309,7 @@ const MapSimulationPage = () => {
         },
       });
     },
-    [selectedDistrict]
+    [navigate, selectedDistrict]
   );
 
   const styleDistrict = useCallback(
@@ -275,6 +335,9 @@ const MapSimulationPage = () => {
         click: () => {
           setSelectedMunicipality(name);
           setSelectedParish(null);
+          navigate(
+            `/map/${slugifyPlaceName(selectedDistrict)}/${slugifyPlaceName(name)}`
+          );
           const bounds = (layer as any).getBounds?.();
           if (bounds) {
             setZoomTargetLevel("municipality");
@@ -284,7 +347,7 @@ const MapSimulationPage = () => {
         },
       });
     },
-    [selectedMunicipality]
+    [navigate, selectedDistrict, selectedMunicipality]
   );
 
   const styleMuni = useCallback(
@@ -309,6 +372,9 @@ const MapSimulationPage = () => {
         },
         click: () => {
           setSelectedParish(name);
+          navigate(
+            `/map/${slugifyPlaceName(selectedDistrict)}/${slugifyPlaceName(selectedMunicipality)}/${slugifyPlaceName(name)}`
+          );
           const bounds = (layer as any).getBounds?.();
           if (bounds) {
             setZoomTargetLevel("parish");
@@ -317,7 +383,7 @@ const MapSimulationPage = () => {
         },
       });
     },
-    [selectedParish]
+    [navigate, selectedDistrict, selectedMunicipality, selectedParish]
   );
 
   const styleParish = useCallback(
@@ -339,6 +405,7 @@ const MapSimulationPage = () => {
     setZoomTargetLevel(null);
     setIsDistrictZooming(false);
     setIsMunicipalityZooming(false);
+    navigate("/map");
   };
 
   const onFlyBoundsDone = useCallback(() => {
@@ -367,13 +434,69 @@ const MapSimulationPage = () => {
 
   // Determine what to show in the status area
   const currentStep = !selectedDistrict ? "district" : !selectedMunicipality ? "municipality" : !selectedParish ? "parish" : "result";
+  const locationPath = [
+    "/map",
+    selectedDistrict && slugifyPlaceName(selectedDistrict),
+    selectedMunicipality && slugifyPlaceName(selectedMunicipality),
+    selectedParish && slugifyPlaceName(selectedParish),
+  ].filter(Boolean).join("/");
+  const locationName = selectedParish || selectedMunicipality || selectedDistrict || "Portugal";
+  const locationContext = selectedParish
+    ? `${selectedMunicipality}, ${selectedDistrict} · Portugal`
+    : selectedMunicipality
+      ? `${selectedDistrict} · Portugal`
+      : "Portugal";
+  const locationLevelLabel = selectedParish ? "Parish" : selectedMunicipality ? "Municipality" : selectedDistrict ? "District" : "Country";
+  const seoTitle = selectedParish
+    ? `${selectedParish}, ${selectedMunicipality} - mapa e iluminação pública`
+    : selectedMunicipality
+      ? `${selectedMunicipality}, ${selectedDistrict} - mapa por freguesia`
+      : selectedDistrict
+        ? `Distrito de ${selectedDistrict} - mapa por concelho`
+        : "Mapa de Portugal por distrito, concelho e freguesia";
+  const seoDescription = selectedParish
+    ? `Explore o mapa de ${selectedParish}, no concelho de ${selectedMunicipality}, distrito de ${selectedDistrict}, e consulte a simulação EVDCGrid para iluminação pública e carregamento elétrico.`
+    : selectedMunicipality
+      ? `Explore o concelho de ${selectedMunicipality}, distrito de ${selectedDistrict}, e selecione uma freguesia no mapa EVDCGrid.`
+      : selectedDistrict
+        ? `Explore o distrito de ${selectedDistrict} por concelho e freguesia no mapa EVDCGrid.`
+        : "Explore o mapa EVDCGrid de Portugal por distrito, concelho e freguesia e consulte oportunidades de iluminação pública e redes DC.";
+  const breadcrumbs = [
+    { name: "Mapa de Portugal", path: "/map" },
+    ...(selectedDistrict ? [{ name: selectedDistrict, path: `/map/${slugifyPlaceName(selectedDistrict)}` }] : []),
+    ...(selectedMunicipality ? [{
+      name: selectedMunicipality,
+      path: `/map/${slugifyPlaceName(selectedDistrict)}/${slugifyPlaceName(selectedMunicipality)}`,
+    }] : []),
+    ...(selectedParish ? [{ name: selectedParish, path: locationPath }] : []),
+  ];
 
   return (
     <div className="site-page">
       <Seo
-        title="Portugal map explorer"
-        description="Explore Portugal districts, municipalities and parishes to assess public lighting infrastructure and DC grid opportunities by location."
-        path="/map"
+        title={seoTitle}
+        description={seoDescription}
+        path={locationPath}
+        structuredData={[
+          {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: locationName ? `Mapa EVDCGrid - ${locationName}` : "Mapa EVDCGrid de Portugal",
+            url: `https://evdcgrid.pt${locationPath}`,
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: breadcrumbs.map((item, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: item.name,
+              item: `https://evdcgrid.pt${item.path}`,
+            })),
+          },
+        ]}
       />
       <Navbar />
       <div className="site-section-strong pb-16 pt-24">
@@ -393,29 +516,31 @@ const MapSimulationPage = () => {
             <div className="lg:col-span-1 flex flex-col gap-4">
               {/* Breadcrumb */}
               <div className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap min-h-[1.5rem]">
-                <button onClick={resetSelection} className="hover:text-primary transition-colors font-medium">
+                <Link to="/map" onClick={resetSelection} className="hover:text-primary transition-colors font-medium">
                   Portugal
-                </button>
+                </Link>
                 {selectedDistrict && (
                   <>
                     <ChevronRight size={12} />
-                    <button
+                    <Link
+                      to={`/map/${slugifyPlaceName(selectedDistrict)}`}
                       onClick={() => { setSelectedMunicipality(null); setSelectedParish(null); setFilteredParishes(null); }}
                       className="hover:text-primary transition-colors"
                     >
                       {selectedDistrict}
-                    </button>
+                    </Link>
                   </>
                 )}
                 {selectedMunicipality && (
                   <>
                     <ChevronRight size={12} />
-                    <button
+                    <Link
+                      to={`/map/${slugifyPlaceName(selectedDistrict)}/${slugifyPlaceName(selectedMunicipality)}`}
                       onClick={() => { setSelectedParish(null); }}
                       className="hover:text-primary transition-colors"
                     >
                       {selectedMunicipality}
-                    </button>
+                    </Link>
                   </>
                 )}
                 {selectedParish && (
@@ -479,7 +604,7 @@ const MapSimulationPage = () => {
               <div className="rounded-lg border border-border bg-card p-4">
                 {currentStep === "district" && (
                   <p className="text-sm text-muted-foreground text-center">
-                    👆 Click a <span className="text-primary font-medium">district</span> on the map
+                    Click a <span className="text-primary font-medium">district</span> on the map
                   </p>
                 )}
                 {currentStep === "municipality" && (
@@ -488,7 +613,7 @@ const MapSimulationPage = () => {
                       District: <span className="text-primary font-medium">{selectedDistrict}</span>
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      👆 Now click a <span className="text-[hsl(35,80%,50%)] font-medium">municipality</span>
+                      Now click a <span className="text-[hsl(35,80%,50%)] font-medium">municipality</span>
                     </p>
                     {loadingMunis && (
                       <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
@@ -503,7 +628,7 @@ const MapSimulationPage = () => {
                       {selectedDistrict} → <span className="text-[hsl(35,80%,50%)] font-medium">{selectedMunicipality}</span>
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      👆 Now click a <span className="text-[hsl(270,60%,65%)] font-medium">parish</span>
+                      Now click a <span className="text-[hsl(270,60%,65%)] font-medium">parish</span>
                     </p>
                     {loadingParishes && (
                       <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
@@ -527,32 +652,32 @@ const MapSimulationPage = () => {
             {/* Results dashboard */}
             <div className="lg:col-span-2 relative">
               {/* Loading overlay */}
-              {loadingParishData && (
+              {loadingLocationData && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-sm rounded-lg">
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">Loading parish data...</p>
+                    <p className="text-sm text-muted-foreground">Loading location data...</p>
                   </div>
                 </div>
               )}
 
-              {parishError && (
+              {locationError && (
                 <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
-                  <p className="text-sm text-destructive">{parishError}</p>
+                  <p className="text-sm text-destructive">{locationError}</p>
                 </div>
               )}
 
-              {parishData && selectedParish ? (
+              {locationData ? (
                 <div className="space-y-6">
                   {/* Header */}
                   <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 glow-primary">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div>
-                        <h3 className="font-heading font-bold text-xl">{selectedParish}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{selectedMunicipality}, {selectedDistrict} · Portugal</p>
+                        <h3 className="font-heading font-bold text-xl">{locationName}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">{locationContext}</p>
                       </div>
                       <div className="self-start rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-mono font-medium text-primary">
-                        E-REDES data · {parishData.period.label}
+                        {locationLevelLabel} · E-REDES data · {locationData.period.label}
                       </div>
                     </div>
                   </div>
@@ -565,19 +690,19 @@ const MapSimulationPage = () => {
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Total Luminaires</div>
-                        <div className="text-3xl font-heading font-black text-foreground">{parishData.total.total_lights.toLocaleString("de-DE")}</div>
+                        <div className="text-3xl font-heading font-black text-foreground">{locationData.total.total_lights.toLocaleString("de-DE")}</div>
                       </div>
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Percentage of LEDs</div>
-                        <div className="text-3xl font-heading font-black text-foreground">{typeof parishData.led.led_percentage === "number" ? parishData.led.led_percentage.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%" : String(parishData.led.led_percentage).replace(".", ",")}</div>
+                        <div className="text-3xl font-heading font-black text-foreground">{typeof locationData.led.led_percentage === "number" ? locationData.led.led_percentage.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%" : String(locationData.led.led_percentage).replace(".", ",")}</div>
                       </div>
-                      <div className={`rounded-lg border p-5 ${parishData.dc.led_annual_savings >= 0 ? "border-emerald-500/25 bg-emerald-500/5" : "border-destructive/30 bg-destructive/5"}`}>
+                      <div className={`rounded-lg border p-5 ${locationData.dc.led_annual_savings >= 0 ? "border-emerald-500/25 bg-emerald-500/5" : "border-destructive/30 bg-destructive/5"}`}>
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Annual LED Energy Savings</div>
-                        <div className={`text-3xl font-heading font-black ${parishData.dc.led_annual_savings >= 0 ? "text-emerald-600" : "text-destructive"}`}>
-                          {parishData.dc.led_annual_savings >= 0 ? formatEuro(parishData.dc.led_annual_savings) : `-${formatEuro(Math.abs(parishData.dc.led_annual_savings))}`}
+                        <div className={`text-3xl font-heading font-black ${locationData.dc.led_annual_savings >= 0 ? "text-emerald-600" : "text-destructive"}`}>
+                          {locationData.dc.led_annual_savings >= 0 ? formatEuro(locationData.dc.led_annual_savings) : `-${formatEuro(Math.abs(locationData.dc.led_annual_savings))}`}
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          {Math.round(parishData.dc.current_non_led_power).toLocaleString("de-DE")} kW non-LED → {Math.round(parishData.dc.converted_non_led_power).toLocaleString("de-DE")} kW LED
+                          {Math.round(locationData.dc.current_non_led_power).toLocaleString("de-DE")} kW non-LED → {Math.round(locationData.dc.converted_non_led_power).toLocaleString("de-DE")} kW LED
                         </div>
                       </div>
                     </div>
@@ -591,11 +716,11 @@ const MapSimulationPage = () => {
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">AC Chargers Possible Now</div>
-                        <div className="text-3xl font-heading font-black text-foreground">{parishData.dc.current_chargers.toLocaleString("de-DE")}</div>
+                        <div className="text-3xl font-heading font-black text-foreground">{locationData.dc.current_chargers.toLocaleString("de-DE")}</div>
                       </div>
                       <div className="rounded-lg border border-primary/30 bg-primary/5 p-5 glow-primary">
                         <div className="text-[0.68rem] xl:text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1 whitespace-nowrap">EV Chargers with DC Solution</div>
-                        <div className="text-3xl font-heading font-black text-primary">{parishData.dc.dc_chargers.toLocaleString("de-DE")}</div>
+                        <div className="text-3xl font-heading font-black text-primary">{locationData.dc.dc_chargers.toLocaleString("de-DE")}</div>
                       </div>
                       <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/5 p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Increase in Chargers</div>
@@ -619,15 +744,15 @@ const MapSimulationPage = () => {
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Current AC Power Available</div>
-                        <div className="text-2xl font-heading font-black text-foreground">{Math.round(parishData.dc.ac_power).toLocaleString("de-DE")} kW</div>
+                        <div className="text-2xl font-heading font-black text-foreground">{Math.round(locationData.dc.ac_power).toLocaleString("de-DE")} kW</div>
                       </div>
                       <div className="rounded-lg border border-primary/25 bg-primary/5 p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Additional DC Power Capacity</div>
-                        <div className="text-2xl font-heading font-black text-primary">{Math.round(parishData.dc.dc_power).toLocaleString("de-DE")} kW</div>
+                        <div className="text-2xl font-heading font-black text-primary">{Math.round(locationData.dc.dc_power).toLocaleString("de-DE")} kW</div>
                       </div>
                       <div className="rounded-lg border border-border bg-card p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Number of Racks Required</div>
-                        <div className="text-2xl font-heading font-black text-foreground">{parishData.dc.number_of_racks.toLocaleString("de-DE")}</div>
+                        <div className="text-2xl font-heading font-black text-foreground">{locationData.dc.number_of_racks.toLocaleString("de-DE")}</div>
                       </div>
                     </div>
                   </div>
@@ -640,24 +765,24 @@ const MapSimulationPage = () => {
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div className="rounded-lg border border-destructive/25 bg-destructive/5 p-5">
                         <div className="text-[0.68rem] xl:text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1 whitespace-nowrap">Traditional AC Investment Cost</div>
-                        <div className="text-2xl font-heading font-black text-destructive">{formatEuro(parishData.dc.investment_value_ac)}</div>
+	                        <div className="text-2xl font-heading font-black text-destructive">{formatEuro(locationData.dc.investment_value_ac)}</div>
                       </div>
                       <div className="rounded-lg border border-primary/25 bg-primary/5 p-5">
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">DC Solution Investment</div>
-                        <div className="text-2xl font-heading font-black text-primary">{formatEuro(parishData.dc.investment_value_dc)}</div>
+	                        <div className="text-2xl font-heading font-black text-primary">{formatEuro(locationData.dc.investment_value_dc)}</div>
                       </div>
                       <div className={`rounded-lg border p-5 ${investmentSavings >= 0 ? "border-emerald-500/25 bg-emerald-500/5" : "border-destructive/30 bg-destructive/5"}`}>
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Savings vs Traditional AC</div>
                         <div className={`text-2xl font-heading font-black ${investmentSavings >= 0 ? "text-emerald-600" : "text-destructive"}`}>
-                          {parishData.dc.investment_value_ac > 0
-                            ? formatEuro(parishData.dc.investment_savings)
-                            : "N/A"}
+	                          {locationData.dc.investment_value_ac > 0
+	                            ? formatEuro(locationData.dc.investment_savings)
+	                            : "N/A"}
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              ) : !loadingParishData && !parishError ? (
+	              ) : !loadingLocationData && !locationError ? (
                 <div className="flex items-center justify-center h-full rounded-lg border border-dashed border-border bg-card/50 p-16">
                   <div className="text-center">
                     <MapPin className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
