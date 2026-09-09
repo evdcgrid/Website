@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">EVDCGrid DC energy community architecture</title>
+  <desc id="desc">Simplified schematic showing an AC low voltage grid connected to an EVDCGrid interface cabinet and a monitored DC bus serving solar PV, battery storage, EV charging and flexible loads.</desc>
+  <defs>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      .line{fill:none;stroke:#253041;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+      .bus{fill:none;stroke:#0874ff;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;filter:url(#glow)}
+      .node{fill:#0874ff;stroke:#4aa3ff;stroke-width:3}
+      .box{fill:none;stroke:#3b4658;stroke-width:4;rx:14}
+      .thin{fill:none;stroke:#3b4658;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+      .text{fill:#6f7b8f;font-family:Inter,Arial,sans-serif;font-size:30px;font-weight:700}
+      .small{fill:#6f7b8f;font-family:Inter,Arial,sans-serif;font-size:24px;font-weight:650}
+      .label{fill:#8a95a8;font-family:Inter,Arial,sans-serif;font-size:22px;font-weight:600}
+    </style>
+  </defs>
+
+  <g transform="translate(70 245)">
+    <path class="line" d="M0 150h130"/>
+    <path class="thin" d="M25 150 65 40l40 110M45 92h42M35 123h62"/>
+    <path class="thin" d="M16 80h98M10 116h110M23 62l-16 12M118 62l16 12M15 100l-16 12M124 100l16 12"/>
+    <circle class="thin" cx="174" cy="150" r="44"/>
+    <circle class="thin" cx="224" cy="150" r="44"/>
+    <text class="small" x="0" y="230">AC LV Grid</text>
+  </g>
+
+  <g transform="translate(420 265)">
+    <rect class="box" x="0" y="0" width="150" height="150"/>
+    <path class="thin" d="M0 150 150 0"/>
+    <path class="thin" d="M28 50c18-22 34-22 52 0"/>
+    <path class="thin" d="M95 104h28M95 124h46"/>
+    <text class="small" x="-20" y="210">EVDCGrid</text>
+    <text class="label" x="-12" y="242">Interface cabinet</text>
+  </g>
+
+  <path class="line" d="M294 395h126"/>
+  <path class="bus" d="M570 340H970"/>
+  <path class="bus" d="M970 220v360"/>
+  <circle class="node" cx="570" cy="340" r="12"/>
+  <circle class="node" cx="760" cy="340" r="12"/>
+  <circle class="node" cx="970" cy="340" r="12"/>
+  <circle class="node" cx="970" cy="220" r="12"/>
+  <circle class="node" cx="970" cy="460" r="12"/>
+  <circle class="node" cx="970" cy="580" r="12"/>
+  <text class="text" x="650" y="300">Monitored</text>
+  <text class="text" x="650" y="335">DC bus</text>
+
+  <g transform="translate(700 75)">
+    <path class="bus" d="M60 145v120"/>
+    <path class="thin" d="M0 0h160l-28 95H-28zM8 24h134M0 50h126M-8 74h119M38 0 12 95M82 0 56 95M126 0 100 95"/>
+    <path class="thin" d="M44 112h32M60 96v48"/>
+    <text class="small" x="5" y="-18">Solar PV</text>
+  </g>
+
+  <g transform="translate(650 465)">
+    <path class="bus" d="M110-125v125"/>
+    <rect class="box" x="0" y="0" width="220" height="120"/>
+    <rect class="thin" x="38" y="24" width="44" height="72"/>
+    <rect class="thin" x="92" y="24" width="44" height="72"/>
+    <rect class="thin" x="146" y="24" width="44" height="72"/>
+    <path class="thin" d="M105 60h20M115 50v20"/>
+    <text class="small" x="-25" y="170">Battery storage</text>
+  </g>
+
+  <g transform="translate(1085 120)">
+    <path class="bus" d="M-115 100H0"/>
+    <rect class="box" x="0" y="0" width="105" height="170"/>
+    <path class="thin" d="m50 34-17 41h26l-18 50"/>
+    <path class="thin" d="M125 68c24 0 35 16 35 42v38c0 25 11 40 35 40"/>
+    <path class="thin" d="M165 40v52M190 40v52"/>
+    <text class="small" x="150" y="82">EV charging</text>
+  </g>
+
+  <g transform="translate(1085 360)">
+    <path class="bus" d="M-115 100H0"/>
+    <rect class="box" x="0" y="0" width="105" height="170"/>
+    <path class="thin" d="M24 138h58M26 138V55l28-28 28 28v83M44 78h20M44 106h20"/>
+    <text class="small" x="150" y="84">Flexible loads</text>
+    <text class="label" x="150" y="116">Buildings, HVAC, pumps</text>
+  </g>
+
+  <g transform="translate(1085 560)">
+    <path class="bus" d="M-115 20H0"/>
+    <rect class="box" x="0" y="-45" width="105" height="90"/>
+    <path class="thin" d="M24 0h56M52-26V26"/>
+    <text class="small" x="150" y="10">Expansion point</text>
+  </g>
+</svg>

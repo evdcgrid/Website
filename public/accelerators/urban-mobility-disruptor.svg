@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Urban Mobility Disruptor programme image</title>
+  <desc id="desc">Clean EVDCGrid-style fallback visual for Urban Mobility Disruptor.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".55" stop-color="#f3f9ff"/>
+      <stop offset="1" stop-color="#eafff4"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0b6ff0"/>
+      <stop offset="1" stop-color="#42e885"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#0b2d63" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" rx="38" fill="url(#bg)"/>
+  <g opacity=".16" stroke="#8bbcf8">
+    <path d="M0 162h304q20 0 20 20v58q0 20 20 20h172"/>
+    <path d="M0 418h204q20 0 20-20v-58q0-20 20-20h280"/>
+    <circle cx="516" cy="260" r="8" fill="#8bbcf8"/>
+    <circle cx="524" cy="320" r="8" fill="#8bbcf8"/>
+  </g>
+  <path d="M96 493c168-83 329-89 484-18 145 67 320 42 524-70" fill="none" stroke="url(#line)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M96 493c168-83 329-89 484-18 145 67 320 42 524-70" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <g filter="url(#shadow)">
+    <rect x="88" y="92" width="662" height="330" rx="28" fill="#fff" stroke="#cfe0f5" stroke-width="2"/>
+    <text x="140" y="176" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800" letter-spacing="6" fill="#0b6ff0">ACCELERATOR</text>
+    <text x="140" y="254" font-family="Inter, Arial, sans-serif" font-size="62" font-weight="900" fill="#07193f">Urban Mobility</text>
+    <text x="140" y="326" font-family="Inter, Arial, sans-serif" font-size="62" font-weight="900" fill="#07193f">Disruptor</text>
+  </g>
+  <g transform="translate(836 170)" fill="none" stroke="#0b6ff0" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="12" y="78" width="254" height="120" rx="38" fill="#fff" opacity=".85"/>
+    <path d="M56 78l40-54h88l42 54"/>
+    <circle cx="75" cy="212" r="34" fill="#fff"/>
+    <circle cx="204" cy="212" r="34" fill="#fff"/>
+    <path d="M92 136h94M136 78v120"/>
+    <path d="M-70 138H12M266 138h82" stroke="url(#line)" stroke-width="10"/>
+  </g>
+</svg>

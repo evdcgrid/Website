@@ -1,129 +1,97 @@
-import { useState } from "react";
-import { Send, Mail, Building2, User } from "lucide-react";
-import { toast } from "sonner";
+import { Mail, MapPin, MessageSquare, Handshake } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Seo from "@/components/Seo";
 
-const ContactPage = () => {
-  const [form, setForm] = useState({ name: "", email: "", company: "", message: "", pilot: false });
+const contactDetails = [
+  {
+    label: "Location",
+    value: "Lisbon, Portugal",
+    Icon: MapPin,
+  },
+  {
+    label: "Email",
+    value: "geral@evdcgrid.pt",
+    href: "mailto:geral@evdcgrid.pt",
+    Icon: Mail,
+  },
+];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Message sent! We'll get back to you soon.");
-    setForm({ name: "", email: "", company: "", message: "", pilot: false });
-  };
+const conversationTopics = [
+  "Strategic partnerships",
+  "Pilot projects",
+  "Technical and commercial discussions",
+];
 
-  return (
-    <div className="min-h-screen">
-      <Seo
-        title="Contact EVDCGRID"
-        description="Contact EVDCGRID to discuss a pilot project, partnership or more information about DC grid infrastructure for public lighting and EV charging."
-        path="/contact"
-      />
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="section-container">
-          <div className="text-center mb-12">
-            <span className="text-xs font-mono font-medium text-primary uppercase tracking-widest">Get in Touch</span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black mt-3">
-              Contact <span className="gradient-text">Us</span>
-            </h1>
-            <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-              Interested in a pilot project or want to learn more? We'd love to hear from you.
-            </p>
-          </div>
+const ContactPage = () => (
+  <div className="site-page">
+    <Seo
+      title="Contact Us"
+      description="Contact EVDCGrid for partnerships, pilot projects and professional discussions about DC infrastructure for local electrification."
+      path="/contact"
+    />
+    <Navbar />
 
-          <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="text-sm text-muted-foreground flex items-center gap-2 mb-1.5">
-                  <User size={14} /> Name
-                </label>
-                <input
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground flex items-center gap-2 mb-1.5">
-                  <Mail size={14} /> Email
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground flex items-center gap-2 mb-1.5">
-                  <Building2 size={14} /> Company
-                </label>
-                <input
-                  value={form.company}
-                  onChange={(e) => setForm({ ...form, company: e.target.value })}
-                  className="w-full rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">Message</label>
-                <textarea
-                  required
-                  rows={5}
-                  value={form.message}
-                  onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full rounded-md border border-border bg-secondary px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
-                />
-              </div>
-              <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.pilot}
-                  onChange={(e) => setForm({ ...form, pilot: e.target.checked })}
-                  className="accent-primary"
-                />
-                I'm interested in a pilot project
-              </label>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 glow-primary"
-              >
-                <Send size={16} /> Send Message
-              </button>
-            </form>
-
-            <div className="space-y-6">
-              <div className="rounded-lg border border-border bg-card p-6">
-                <h3 className="font-heading font-bold mb-3">Direct Contact</h3>
-                <div className="space-y-3 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Mail size={14} className="text-primary" />
-                    info@evdcgrid.pt
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Building2 size={14} className="text-primary" />
-                    Lisbon, Portugal
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 glow-primary">
-                <h3 className="font-heading font-bold mb-3">Request a Pilot Project</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  We're actively seeking municipality partners for our 2026 pilot program. If you represent a local authority or utility, let's explore how EVDCGRID can transform your lighting infrastructure.
-                </p>
-              </div>
+    <main>
+      <section className="site-section-strong relative overflow-hidden border-b border-border pt-28 lg:pt-32">
+        <div className="absolute inset-0 bg-gradient-to-b from-background/84 via-background/93 to-surface/92" />
+        <div className="section-container relative py-16 lg:py-24">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-primary">Contact Us</span>
+          <div className="mt-5 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl font-black leading-tight text-foreground sm:text-5xl lg:text-6xl">
+                Let’s discuss DC infrastructure opportunities
+              </h1>
+              <p className="mt-6 text-lg leading-8 text-muted-foreground">
+                EVDCGrid is open to professional conversations with organisations interested in partnerships, pilot
+                projects and technical or commercial discussions around DC-based local energy infrastructure.
+              </p>
             </div>
+
+            <article className="rounded-xl border border-primary/15 bg-background/92 p-6 shadow-[0_18px_44px_hsl(214_42%_34%/0.10)] backdrop-blur sm:p-8">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Handshake className="h-7 w-7" />
+              </div>
+              <h2 className="text-2xl font-black text-foreground">Open to conversations</h2>
+              <div className="mt-5 grid gap-3">
+                {conversationTopics.map((topic) => (
+                  <div key={topic} className="flex items-center gap-3 text-sm font-semibold text-foreground">
+                    <MessageSquare className="h-4 w-4 shrink-0 text-primary" />
+                    <span>{topic}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 grid gap-4 border-t border-border pt-6">
+                {contactDetails.map(({ label, value, href, Icon }) => (
+                  <div key={label} className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-primary/15 bg-primary/5 text-primary">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-widest text-primary">{label}</p>
+                      {href ? (
+                        <a
+                          href={href}
+                          className="mt-1 block text-base font-semibold text-foreground transition-colors hover:text-primary"
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        <p className="mt-1 text-base font-semibold text-foreground">{value}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
           </div>
         </div>
-      </div>
-      <Footer />
-    </div>
-  );
-};
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+);
 
 export default ContactPage;

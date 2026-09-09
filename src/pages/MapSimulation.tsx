@@ -472,7 +472,7 @@ const MapSimulationPage = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="site-page">
       <Seo
         title={seoTitle}
         description={seoDescription}
@@ -499,7 +499,7 @@ const MapSimulationPage = () => {
         ]}
       />
       <Navbar />
-      <div className="pt-24 pb-16">
+      <div className="site-section-strong pb-16 pt-24">
         <div className="section-container">
           <div className="text-center mb-12">
             <span className="text-xs font-mono font-medium text-accent uppercase tracking-widest">Map Explorer</span>
