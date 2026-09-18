@@ -48,10 +48,10 @@ export interface FreguesiaData {
   };
 }
 
-interface FetchFreguesiaLightingSimulationParams {
-  district: string;
-  municipality: string;
-  parish: string;
+interface FetchLightingSimulationParams {
+  district?: string;
+  municipality?: string;
+  parish?: string;
   signal: AbortSignal;
 }
 
@@ -64,17 +64,45 @@ function normalizePlaceName(value: string | null | undefined): string {
     .toUpperCase();
 }
 
+function slugifyPlaceName(value: string | null | undefined): string {
+  return (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function escapeOdsString(value: string): string {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
-function buildLightingApiUrl(where: string, limit = 100): string {
+function buildLightingApiUrl(where: string, limit = 100, offset = 0): string {
   const params = new URLSearchParams({
-    where,
     limit: String(limit),
+    offset: String(offset),
     order_by: "ano DESC, mes DESC, tipo_de_lampada",
   });
+  if (where) params.set("where", where);
   return `${EREDES_PUBLIC_LIGHTING_API}?${params.toString()}`;
+}
+
+function aggregateStaticPath({ district, municipality, parish }: FetchLightingSimulationParams): string | null {
+  if (municipality || parish) return null;
+  return district
+    ? `/eredes-aggregates/districts/${slugifyPlaceName(district)}.json`
+    : "/eredes-aggregates/portugal.json";
+}
+
+async function fetchStaticAggregate(path: string, signal: AbortSignal): Promise<FreguesiaData | null> {
+  try {
+    const response = await fetch(path, { signal });
+    if (!response.ok) return null;
+
+    return (await response.json()) as FreguesiaData;
+  } catch {
+    return null;
+  }
 }
 
 function latestLightingPeriod(records: ERedesLightingRecord[]): number {
@@ -86,19 +114,41 @@ async function fetchLightingRecords({
   municipality,
   parish,
   signal,
-}: FetchFreguesiaLightingSimulationParams): Promise<ERedesLightingRecord[]> {
-  const exactWhere = [
-    `distrito="${escapeOdsString(district)}"`,
-    `concelho="${escapeOdsString(municipality)}"`,
-    `freguesia="${escapeOdsString(parish)}"`,
-  ].join(" AND ");
+}: FetchLightingSimulationParams): Promise<ERedesLightingRecord[]> {
+  const clauses = district ? [`distrito="${escapeOdsString(district)}"`] : [];
+  if (municipality) clauses.push(`concelho="${escapeOdsString(municipality)}"`);
+  if (parish) clauses.push(`freguesia="${escapeOdsString(parish)}"`);
+  const exactWhere = clauses.join(" AND ");
 
-  const exactResponse = await fetch(buildLightingApiUrl(exactWhere), { signal });
+  const exactResponse = await fetch(buildLightingApiUrl(exactWhere, 100), { signal });
   if (!exactResponse.ok) throw new Error("E-REDES API error");
   const exactData = await exactResponse.json();
-  if (Array.isArray(exactData.results) && exactData.results.length > 0) {
-    return exactData.results;
+  const initialRecords = Array.isArray(exactData.results) ? exactData.results : [];
+  if (initialRecords.length > 0) {
+    const latestPeriod = latestLightingPeriod(initialRecords);
+    const latestYear = Math.floor(latestPeriod / 100);
+    const latestMonth = latestPeriod % 100;
+    const latestWhere = [
+      exactWhere || undefined,
+      `ano="${latestYear}"`,
+      `mes="${latestMonth}"`,
+    ].filter(Boolean).join(" AND ");
+    const latestRecords: ERedesLightingRecord[] = [];
+    const pageSize = 100;
+
+    for (let offset = 0; ; offset += pageSize) {
+      const response = await fetch(buildLightingApiUrl(latestWhere, pageSize, offset), { signal });
+      if (!response.ok) throw new Error("E-REDES API error");
+      const data = await response.json();
+      const page = Array.isArray(data.results) ? data.results : [];
+      latestRecords.push(...page);
+      if (page.length < pageSize) break;
+    }
+
+    return latestRecords;
   }
+
+  if (!district || !parish || !municipality) return [];
 
   const fallbackResponse = await fetch(buildLightingApiUrl(`"${escapeOdsString(parish)}"`), { signal });
   if (!fallbackResponse.ok) throw new Error("E-REDES API error");
@@ -180,11 +230,13 @@ function calculateSimulation(records: ERedesLightingRecord[]): FreguesiaData {
 }
 
 export async function fetchFreguesiaLightingSimulation(
-  params: FetchFreguesiaLightingSimulationParams
+  params: FetchLightingSimulationParams
 ): Promise<FreguesiaData> {
+  const staticPath = aggregateStaticPath(params);
+  const staticAggregate = staticPath ? await fetchStaticAggregate(staticPath, params.signal) : null;
+  if (staticAggregate) return staticAggregate;
+
   const records = await fetchLightingRecords(params);
-  if (records.length === 0) {
-    throw new Error("No E-REDES records for parish");
-  }
+  if (records.length === 0) throw new Error("No E-REDES records for location");
   return calculateSimulation(records);
 }

@@ -1,0 +1,28 @@
+{
+  "period": {
+    "year": 2026,
+    "month": 8,
+    "label": "08/2026"
+  },
+  "total": {
+    "total_lights": 216246
+  },
+  "led": {
+    "led_percentage": 67.89754437597719
+  },
+  "dc": {
+    "current_chargers": 3149,
+    "dc_chargers": 12731,
+    "ac_power": 34648.62666666666,
+    "dc_power": 140044.24,
+    "number_of_racks": 3183,
+    "led_annual_savings": 1792712.0475840294,
+    "current_lighting_power": 11312.096602485657,
+    "led_lighting_power": 8495.200607765193,
+    "current_non_led_power": 5544.064,
+    "converted_non_led_power": 2727.1680052795373,
+    "investment_value_dc": 123206500,
+    "investment_value_ac": 147682500,
+    "investment_savings": 24476000
+  }
+}
