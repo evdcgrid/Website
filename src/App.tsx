@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { LanguageProvider } from "@/lib/language";
 import Index from "./pages/Index.tsx";
 import TechnologyPage from "./pages/Technology.tsx";
 import ProjectDetailPage from "./pages/ProjectDetail.tsx";
@@ -28,22 +29,24 @@ const ScrollToTop = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/technology" element={<TechnologyPage />} />
-          <Route path="/projects" element={<Navigate to="/projects/dc-public-lighting-grid" replace />} />
-          <Route path="/projects/:slug" element={<ProjectDetailPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/map" element={<MapSimulationPage />} />
-          <Route path="/case-study" element={<CaseStudyPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <LanguageProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/technology" element={<TechnologyPage />} />
+            <Route path="/projects" element={<Navigate to="/projects/dc-public-lighting-grid" replace />} />
+            <Route path="/projects/:slug" element={<ProjectDetailPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/map" element={<MapSimulationPage />} />
+            <Route path="/case-study" element={<CaseStudyPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
