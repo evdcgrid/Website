@@ -400,6 +400,22 @@ const SolutionHero = ({ project }: { project: SolutionProject }) => {
               >
                 View architecture
               </a>
+              {project.slug === "dc-public-lighting-grid" && (
+                <>
+                  <Link
+                    to="/map"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-input bg-background/80 px-5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    Open Map Explorer
+                  </Link>
+                  <Link
+                    to="/case-study"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-input bg-background/80 px-5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    View Case Study
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 

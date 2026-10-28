@@ -5,12 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run generate:sitemap",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "generate:sitemap": "node scripts/generate-sitemap.mjs",
+    "generate:eredes-cache": "node scripts/generate-eredes-aggregates.mjs",
     "fetch:distritos": "node scripts/fetch-distritos-api.mjs",
     "fetch:concelhos": "node scripts/fetch-concelhos-api.mjs",
     "fetch:freguesias": "node scripts/fetch-freguesias-api.mjs",
@@ -72,6 +75,10 @@
     "vaul": "^0.9.9",
     "zod": "^3.25.76"
   },
+  "overrides": {
+    "@xmldom/xmldom": "~0.8.4",
+    "lodash": "^4.18.1"
+  },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
     "@playwright/test": "^1.57.0",
@@ -93,7 +100,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
-    "vite": "^7",
-    "vitest": "^3.2.4"
+    "vite": "^7.3.6",
+    "vitest": "^3.2.7"
   }
 }
