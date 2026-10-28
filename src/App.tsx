@@ -42,6 +42,9 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/map" element={<MapSimulationPage />} />
+            <Route path="/map/:district" element={<MapSimulationPage />} />
+            <Route path="/map/:district/:municipality" element={<MapSimulationPage />} />
+            <Route path="/map/:district/:municipality/:parish" element={<MapSimulationPage />} />
             <Route path="/case-study" element={<CaseStudyPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
