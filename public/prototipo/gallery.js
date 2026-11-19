@@ -1,6 +1,7 @@
 const gallery = document.querySelector(".home-applications");
 const galleryTrack = document.querySelector(".gallery-track");
 const gallerySlides = [...galleryTrack.children];
+const galleryChoices = [...gallery.querySelectorAll("[data-gallery-select]")];
 const galleryPlay = document.querySelector(".gallery-play");
 const galleryMotion = matchMedia("(prefers-reduced-motion: reduce)");
 let galleryIndex = 0;
@@ -46,7 +47,9 @@ function updateGalleryPosition() {
   if (closestIndex === galleryIndex) return;
   galleryIndex = closestIndex;
   galleryTrack.dataset.activeIndex = String(galleryIndex);
-  gallery.style.setProperty("--gallery-index", String(galleryIndex));
+  for (const [index, choice] of galleryChoices.entries()) {
+    choice.setAttribute("aria-pressed", String(index === galleryIndex));
+  }
 }
 
 galleryTrack.addEventListener("scroll", () => {
@@ -66,6 +69,12 @@ galleryPlay.addEventListener("click", () => setGalleryPaused(!galleryPaused));
 galleryMotion.addEventListener("change", () => setGalleryPaused(galleryMotion.matches));
 document.addEventListener("visibilitychange", queueGalleryAdvance);
 
+for (const choice of galleryChoices) {
+  choice.addEventListener("click", () => {
+    setGalleryPaused(true);
+    goToGallerySlide(Number(choice.dataset.gallerySelect));
+  });
+}
 for (const control of document.querySelectorAll("[data-gallery-direction]")) {
   control.addEventListener("click", () => {
     setGalleryPaused(true);

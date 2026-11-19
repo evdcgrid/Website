@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>EVDCGrid — Micro-redes DC</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css?v=site-operations">
+<script src="territorio.js?v=charger-gain" defer></script>
+<script src="idioma.js?v=site-operations" defer></script>
+<script src="prototype.js?v=charger-gain" defer></script>
+<script src="navigation.js?v=site-study" defer></script>
+<script src="motion.js?v=component-atlas" defer></script>
+<script src="gallery.js?v=application-index" defer></script>
+<script src="energy-flow.js?v=ccs2" defer></script>
+</head>
+<body>
+<div class="hero-backdrop" aria-hidden="true">
+  <div class="hero-wall-art"><img src="frota-vertical.webp" width="1122" height="1402" alt="" fetchpriority="high"></div>
+</div>
+<div class="hero-foreground" aria-hidden="true">
+  <div class="hero-wall-plane">
+    <div class="hero-wall-art"><img src="frota-vertical.webp" width="1122" height="1402" alt=""></div>
+  </div>
+</div>
+<a class="skip" href="#inicio">Saltar para o conteúdo</a>
+<header class="top-shell">
+<div class="wrap top">
+  <a class="brand" href="?pagina=inicio"><img src="marca-clara.svg" alt="EVDCGrid" width="148" height="25"></a>
+  <nav aria-label="Navegação principal"><a href="?pagina=inicio" data-page-link="home">Início</a><a href="?pagina=tecnologia" data-page-link="tecnologia">Tecnologia</a><a href="?pagina=aplicacoes" data-page-link="aplicacoes">Aplicações</a></nav>
+  <div class="top-actions"><div class="language" role="group" aria-label="Idioma"><button type="button" lang="pt" data-language="pt" aria-pressed="true">PT</button><button type="button" lang="en" data-language="en" aria-pressed="false">EN</button></div>
+  <a class="button header-cta" href="#contacto">Discutir projeto <span aria-hidden="true">↗</span></a></div>
+</div>
+</header>
+<main id="inicio">
+<section data-page="home" class="wrap hero hero-cinema" aria-labelledby="headline">
+  <div class="hero-copy">
+    <p class="kicker"><i></i> Engenharia e integração</p>
+    <h1 id="headline">Soluções de carregamento de veículos elétricos com micro-redes DC</h1>
+    <div class="hero-description"><p class="intro">Desenhamos a micro-rede à medida do seu local. Ao ligar carregadores, painéis solares e baterias em corrente contínua, é possível reduzir etapas de conversão e alimentar mais carregadores com a potência disponível.</p>
+    <div class="actions"><a class="button" href="#contacto">Falar sobre o meu projeto <span aria-hidden="true">↗</span></a><a class="text-link" href="?pagina=tecnologia#tecnologia">Ver como funciona <span aria-hidden="true">↓</span></a></div></div>
+  </div>
+  <p class="hero-credit">Visualização conceptual</p>
+</section>
+<section data-page="home" class="mobility-chapter" id="mobilidade">
+  <div class="opening-continuation" aria-hidden="true"></div>
+  <div class="wrap site-study" data-site-scenario="power">
+  <div class="study-heading"><p class="kicker">Mobilidade elétrica</p><h2>O local dita a solução.</h2><p class="intro">Num projeto de raiz ou numa expansão, integramos equipamentos de diferentes fornecedores. O ponto de partida é o que precisa de alimentar e quando.</p></div>
+  <div class="study-workspace">
+    <div class="deployment-options" role="group" aria-label="Tipo de projeto">
+      <button type="button" data-scenario="power" aria-pressed="true">Potência limitada</button>
+      <button type="button" data-scenario="expand" aria-pressed="false">Alargar um local</button>
+      <button type="button" data-scenario="new" aria-pressed="false">Construir de raiz</button>
+    </div>
+    <figure class="study-figure">
+      <div class="study-camera">
+        <img src="modelo-parque.webp" width="1500" height="1000" alt="" loading="lazy">
+        <span class="study-pin pin-power"><span>Bateria</span></span>
+        <span class="study-pin pin-expand"><span>Lugares de carregamento</span></span>
+        <span class="study-pin pin-new"><span>Cobertura solar</span></span>
+      </div>
+      <figcaption>Visualização conceptual</figcaption>
+    </figure>
+    <div class="study-detail">
+    <div class="deployment-result" aria-live="polite"><h3 id="scenario-title">Instalar carregadores com a potência disponível</h3><p id="scenario-copy">Avaliamos o limite da ligação e os picos de carregamento. Uma bateria pode cobrir parte desses picos e reduzir a necessidade de reforçar a ligação.</p></div>
+    <a class="text-link" href="?pagina=aplicacoes#carregamento">Explorar carregamento elétrico <span aria-hidden="true">↗</span></a>
+    </div>
+  </div>
+  </div>
+</section>
+<section data-page="home" class="home-technology" id="energia">
+  <div class="wrap home-technology-layout" data-reveal>
+    <div class="engineering-heading">
+      <p class="kicker">Tecnologia</p>
+      <h2>Mais potência onde faz falta.</h2>
+    </div>
+    <div class="engineering-intro">
+      <p>Um barramento DC liga solar, baterias e carregamento. A energia local ajuda a cobrir os picos de procura, com menos conversões entre AC e DC.</p>
+      <p class="home-ems">O EMS antecipa o preço da energia e a produção solar para decidir quando usar a bateria.</p>
+      <a class="text-link" href="?pagina=tecnologia#tecnologia">Explorar a tecnologia <span aria-hidden="true">↗</span></a>
+    </div>
+  </div>
+  <div class="wrap grid-story">
+    <figure class="story-visual" data-stage="solar" data-flow-diagram>
+      <div class="component-detail" aria-hidden="true">
+        <div class="component-texture"></div>
+      </div>
+      <svg class="story-circuit" viewBox="0 0 560 306" aria-hidden="true" focusable="false">
+        <g class="story-wires">
+          <path class="solar-feed" d="M146 84H270"/>
+          <path class="battery-feed" d="M146 223H270"/>
+          <path class="charging-feed" d="M270 152H429"/>
+          <path class="charging-feed arrow-head" d="m408 144 9 8-9 8"/>
+          <path class="solar-feed arrow-head" d="m197 77 8 7-8 7"/>
+          <path class="battery-feed arrow-head" d="m197 216 8 7-8 7"/>
+          <path class="bus-rail" d="M270 59V84M270 223V248"/>
+          <path class="bus-rail rail-solar" d="M270 84V152"/>
+          <path class="bus-rail rail-battery" d="M270 152V223"/>
+        </g>
+        <g class="energy-flow-layer"></g>
+        <g class="story-equipment story-solar">
+          <circle cx="111" cy="84" r="34"/>
+          <path class="equipment-icon" d="M100 86h22l3 13H97zm11 0v13m-13-6.5h25m-16 11h8m-11-23a7 7 0 1 1 14 0m-14-13-3-3m14 2 2-4m7 13 5-2m-32 4-4-1"/>
+          <text x="111" y="139">Solar</text>
+        </g>
+        <g class="story-equipment story-battery">
+          <circle cx="111" cy="223" r="34"/>
+          <path class="equipment-icon" d="M94 214h31v18H94z M125 219h4v8h-4m-23-4h14m-7-5v10"/>
+          <text x="111" y="278">Bateria</text>
+        </g>
+        <g class="story-equipment story-bus">
+          <circle cx="270" cy="84" r="4"/><circle cx="270" cy="152" r="4"/><circle cx="270" cy="223" r="4"/>
+          <text x="270" y="278">Barramento DC</text>
+        </g>
+        <g class="story-equipment story-load">
+          <circle cx="463" cy="152" r="34"/>
+          <path class="equipment-icon" d="M452 170v-34h16v34m-19 0h22m-15-29h8v8h-8m12 4h5l5 5v7c0 4-5 4-5 0v-4"/>
+          <text x="463" y="207">Carregamento elétrico</text>
+        </g>
+      </svg>
+    </figure>
+    <ol class="story-steps">
+      <li data-story-step="solar"><h3>O solar produz no local.</h3><p>A produção fotovoltaica injeta energia na micro-rede através da ligação DC.</p></li>
+      <li data-story-step="bus"><h3>O barramento DC leva a energia até aos carregadores.</h3><p>A energia solar pode alimentar carregadores compatíveis sem uma conversão intermédia para AC.</p></li>
+      <li data-story-step="battery"><h3>A bateria ajuda a cobrir o pico.</h3><p>Quando aumenta a procura, a bateria pode fornecer parte da potência necessária e aliviar a ligação à rede.</p></li>
+    </ol>
+  </div>
+</section>
+<section data-page="home" class="home-applications" id="galeria" aria-labelledby="gallery-title">
+  <div class="wrap application-atlas">
+    <div class="gallery-heading"><h2 id="gallery-title">Onde aplicar uma micro-rede DC</h2></div>
+    <div class="gallery-choices" role="group" aria-label="Escolher uma aplicação">
+      <button type="button" data-gallery-select="0" aria-pressed="true" aria-controls="gallery-track"><img src="galeria-carregamento.webp" alt="" width="72" height="48" loading="lazy"><span>Hubs de carregamento</span></button>
+      <button type="button" data-gallery-select="1" aria-pressed="false" aria-controls="gallery-track"><img src="galeria-comunidades.webp" alt="" width="72" height="48" loading="lazy"><span>Comunidades de energia</span></button>
+      <button type="button" data-gallery-select="2" aria-pressed="false" aria-controls="gallery-track"><img src="galeria-iluminacao.webp" alt="" width="72" height="48" loading="lazy"><span>Iluminação pública</span></button>
+    </div>
+  <div class="gallery-track" id="gallery-track">
+    <article class="gallery-slide">
+      <a href="?pagina=aplicacoes#carregamento">
+        <div class="gallery-image"><img src="galeria-carregamento.webp" width="1180" height="664" alt="" loading="lazy"></div>
+        <div class="gallery-caption">
+          <div><h3>Hubs de carregamento</h3><p>Mais carregadores com a potência disponível.</p></div>
+          <span aria-hidden="true">↗</span>
+        </div>
+      </a>
+    </article>
+    <article class="gallery-slide">
+      <a href="?pagina=aplicacoes#comunidades">
+        <div class="gallery-image"><img src="galeria-comunidades.webp" width="1180" height="664" alt="" loading="lazy"></div>
+        <div class="gallery-caption">
+          <div><h3>Comunidades de energia</h3><p>Ligue produção, armazenamento e consumo numa rede local.</p></div>
+          <span aria-hidden="true">↗</span>
+        </div>
+      </a>
+    </article>
+    <article class="gallery-slide">
+      <a href="?pagina=aplicacoes#iluminacao">
+        <div class="gallery-image"><img src="galeria-iluminacao.webp" width="1180" height="664" alt="" loading="lazy"></div>
+        <div class="gallery-caption">
+          <div><h3>Iluminação pública</h3><p>Avalie a adaptação de uma rede de iluminação pública à corrente contínua.</p></div>
+          <span aria-hidden="true">↗</span>
+        </div>
+      </a>
+    </article>
+  </div>
+    <div class="gallery-footer">
+    <div class="gallery-controls" role="group" aria-label="Controlos da galeria">
+      <button type="button" class="gallery-play" aria-controls="gallery-track">
+        <span class="gallery-pause-label">Pausar galeria</span>
+        <span class="gallery-resume-label" hidden>Reproduzir galeria</span>
+      </button>
+      <button type="button" data-gallery-direction="-1" aria-label="Imagem anterior" aria-controls="gallery-track"><span aria-hidden="true">←</span></button>
+      <button type="button" data-gallery-direction="1" aria-label="Imagem seguinte" aria-controls="gallery-track"><span aria-hidden="true">→</span></button>
+    </div>
+      <a class="text-link home-map-link" href="?pagina=aplicacoes#mapa">Consultar mapa de investimento <span aria-hidden="true">↗</span></a>
+    </div>
+  </div>
+</section>
+<section data-page="tecnologia" class="technology" id="tecnologia" hidden>
+  <div class="wrap tech-overview">
+    <header class="tech-lead">
+      <div><p class="kicker">A micro-rede DC</p><h1>Uma rede local. Mais margem para crescer.</h1></div>
+      <p class="tech-intro">Um barramento DC integra os ativos. A produção solar e a bateria ajudam a alimentar novas cargas dentro da potência disponível no local.</p>
+    </header>
+    <figure class="network" data-mode="solar" data-flow-diagram>
+      <div class="network-toolbar">
+        <div class="switch" role="group" aria-label="Cenário da micro-rede"><button type="button" data-mode="solar" aria-pressed="true">Produção solar</button><button type="button" data-mode="peak" aria-pressed="false">Pico de procura</button></div>
+        <button class="flow-toggle" type="button" hidden><span>Pausar fluxo</span><span hidden>Retomar fluxo</span></button>
+      </div>
+      <div class="network-scene" aria-hidden="true">
+        <img src="parque-solar.webp" class="scene-solar" width="1254" height="627" alt="">
+        <img src="parque-pico.webp" class="scene-peak" width="1254" height="627" alt="">
+        <small>Visualização conceptual</small>
+      </div>
+    <div class="wiring" aria-hidden="true">
+      <div class="node grid"><b>Rede AC</b><span>Interface AC/DC</span></div>
+      <div class="node solar"><b>Solar</b><span class="node-idle">Produção local</span><span class="node-active">A alimentar EV</span></div>
+      <div class="node ems"><b>EMS</b><span>Gestão preditiva</span></div>
+      <div class="bus"><strong>Barramento DC</strong><i class="bus-arrow" aria-hidden="true"></i></div>
+      <div class="node battery"><b>Bateria</b><span class="node-idle">Armazenamento</span><span class="node-active">A descarregar</span></div>
+      <div class="node ev"><b>Carregamento EV</b><span>Carga local</span></div>
+      <svg class="energy-flow-layer wiring-flow" aria-hidden="true" focusable="false"></svg>
+    </div>
+      <figcaption id="flow" aria-live="polite">O solar alimenta o carregamento pelo barramento DC, evitando uma passagem intermédia por AC.</figcaption>
+    </figure>
+  </div>
+  <div class="tech-principles">
+    <div class="wrap principles-layout">
+      <div class="principles-intro">
+        <h2>Decisões de projeto</h2>
+        <details class="ems-note"><summary>Gestão preditiva de energia <span>EMS</span></summary><p>O EMS usa previsões horárias do preço da eletricidade e meteorologia a sete dias para gerir o solar e decidir quando carregar ou descarregar a bateria.</p></details>
+      </div>
+      <div class="benefits" data-reveal>
+    <article><svg class="benefit-drawing" viewBox="0 0 48 36" aria-hidden="true" focusable="false"><path d="M3 28h42M5 24l9-4 6-12 7 10 11 4" /><path class="guide" d="M5 24l11-5 7-3 15 6"/></svg><h3>Menos pressão nos picos</h3><p>A produção local e a bateria podem cobrir parte da procura e reduzir a potência pedida à rede.</p></article>
+    <article><svg class="benefit-drawing" viewBox="0 0 48 36" aria-hidden="true" focusable="false"><path d="M3 18h13m13 0h15m-5-4 5 4-5 4"/><circle cx="22.5" cy="18" r="6"/></svg><h3>Um percurso mais direto</h3><p>Ativos compatíveis partilham o barramento DC e evitam etapas de conversão entre AC e DC.</p></article>
+    <article><svg class="benefit-drawing" viewBox="0 0 48 36" aria-hidden="true" focusable="false"><path d="M4 21h11v8H4zm11 4h7v-9h7"/><path class="guide" d="M29 12h12v8H29zM22 16V6h7"/></svg><h3>Expansão por etapas</h3><p>Acrescente carregamento, produção ou armazenamento à medida que as necessidades evoluem.</p></article>
+  </div>
+    </div>
+  </div>
+</section>
+<section data-page="aplicacoes" class="wrap applications" id="aplicacoes" hidden>
+  <h1>Onde aplicar uma micro-rede DC</h1>
+  <div class="application-grid" data-reveal>
+    <article id="carregamento"><img src="carregamento.webp" width="640" height="390" alt="" loading="lazy"><h3>Hubs de carregamento</h3><p>Planeie o carregamento a partir da potência disponível no local. Solar e armazenamento podem cobrir parte dos picos e ajudar a reduzir as intervenções na ligação.</p></article>
+    <article id="comunidades"><img src="comunidades.webp" width="640" height="390" alt="" loading="lazy"><h3>Comunidades de energia</h3><p>Coordene produção, armazenamento e consumo numa rede local.</p></article>
+    <article id="iluminacao"><img src="iluminacao.webp" width="640" height="390" alt="" loading="lazy"><h3>Iluminação pública</h3><p>Avalie a adaptação de uma rede de iluminação ao contexto do município.</p><a class="text-link" href="#mapa">Consultar mapa de investimento <span aria-hidden="true">↓</span></a></article>
+  </div>
+  <div class="application-path" data-reveal><h3>Da avaliação à instalação</h3><ol>
+    <li><b>Conhecer o local</b><p>Levantamos a potência disponível, o perfil de carregamento e os ativos que podem ser reaproveitados.</p></li>
+    <li><b>Dimensionar a micro-rede</b><p>Comparamos cenários de carregamento, produção e armazenamento e identificamos as intervenções necessárias.</p></li>
+    <li><b>Preparar a instalação</b><p>A solução é dimensionada para simplificar a obra e a ligação sempre que possível. Os prazos e requisitos de licenciamento e ligação dependem do local e do operador de rede aplicável.</p></li>
+  </ol></div>
+</section>
+<section data-page="aplicacoes" hidden class="map-section" id="mapa"><div class="wrap">
+  <p class="kicker"><i></i> Iluminação pública</p>
+  <h2>Mapa de investimento</h2>
+  <p class="intro">Explore a estimativa para uma rede DC de iluminação pública em Portugal continental.</p>
+  <div class="map-layout" data-reveal>
+    <div class="map-panel">
+      <div class="filters">
+        <label>Distrito<select id="district"></select></label>
+        <label>Concelho<select id="municipality"></select></label>
+        <label>Freguesia<select id="parish"></select></label>
+      </div>
+      <div class="estimate" aria-live="polite" aria-atomic="true">
+        <p class="kicker" id="location-label">Portugal continental</p>
+        <p class="estimate-title">Investimento estimado em DC</p>
+        <strong id="amount">A carregar…</strong>
+        <dl id="estimate-comparison" class="estimate-comparison" hidden><div><dt>Investimento estimado em AC</dt><dd id="amount-ac"></dd></div><div class="charger-row"><dt>Carregadores estimados (11 kW)</dt><dd class="charger-detail"><strong id="charger-gain"></strong><span id="charger-comparison"></span></dd></div></dl>
+        <p id="estimate-message">Estimativa indicativa de investimento.</p>
+      </div>
+      <button type="button" id="retry" class="text-link" hidden>Tentar novamente</button>
+      <details id="method"><summary>Ver cálculo</summary><p>Modelo do estudo de caso do Areeiro. O número de lâmpadas é agrupado em circuitos de até 300 e multiplicado pelo custo de referência de 158 940 € por circuito DC.</p><p id="period"></p><p>Fonte de cadastro: <a class="text-link" href="https://e-redes.opendatasoft.com/explore/dataset/cadastro_iluminacao_publica/">E‑REDES</a>. O valor depende do dimensionamento e das condições do local.</p></details>
+    </div>
+    <figure class="map-figure">
+      <figcaption><span id="map-level">Distritos</span><button class="back text-link" id="map-back" type="button" hidden>↑ Subir um nível</button></figcaption>
+      <svg id="territory" viewBox="0 0 440 440" aria-hidden="true"></svg>
+      <p>Selecione no mapa ou nas listas.</p>
+    </figure>
+  </div>
+</div></section>
+<section class="contact" id="contacto"><div class="wrap" data-reveal><div><p class="kicker"><i></i> Contacto</p><h2>O que quer eletrificar?</h2><p>Que equipamentos quer ligar agora e o que prevê acrescentar mais tarde? A nossa equipa acompanha o projeto desde o desenho da rede e continua a dar apoio durante a operação.</p></div><a class="button" href="mailto:geral@evdcgrid.pt">Escrever à EVDCGrid <span aria-hidden="true">↗</span></a></div></section>
+</main>
+<footer class="wrap footer"><a href="#inicio"><img src="marca.svg" alt="EVDCGrid" width="128" height="22"></a><a class="text-link" href="#inicio">Voltar ao topo ↑</a></footer>
+</body>
+</html>

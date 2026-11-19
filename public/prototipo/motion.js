@@ -13,7 +13,7 @@ let revealObserver;
 function updateScrollMotion() {
   animationFrame = 0;
   const viewport = innerHeight;
-  if (currentPage === "home") {
+  if (currentPage === "home" && !motionPreference.matches) {
     const distance = Math.max(0, scrollY);
     const mobile = innerWidth <= 760;
     const backdropProgress = Math.min(1, distance / motionHero.offsetHeight);
@@ -49,9 +49,12 @@ function configureMotion() {
   removeEventListener("resize", scheduleScrollMotion);
   cancelAnimationFrame(animationFrame);
   animationFrame = 0;
+  addEventListener("scroll", scheduleScrollMotion, {passive:true});
+  addEventListener("resize", scheduleScrollMotion);
   if (motionPreference.matches || !("IntersectionObserver" in window)) {
     document.body.removeAttribute("data-motion");
     lastBackdropOffset = 0;
+    scheduleScrollMotion();
     return;
   }
   document.body.dataset.motion = "enabled";
@@ -63,8 +66,6 @@ function configureMotion() {
     }
   }, {threshold: .08});
   for (const target of motionTargets) revealObserver.observe(target);
-  addEventListener("scroll", scheduleScrollMotion, {passive:true});
-  addEventListener("resize", scheduleScrollMotion);
   scheduleScrollMotion();
 }
 

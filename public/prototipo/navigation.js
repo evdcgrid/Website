@@ -33,6 +33,7 @@ let scenario = "power";
 const options = document.querySelectorAll("[data-scenario]");
 function renderScenario() {
   const [title, copy] = scenarios[scenario];
+  document.querySelector(".site-study").dataset.siteScenario = scenario;
   document.querySelector("#scenario-title").textContent = translate(title);
   document.querySelector("#scenario-copy").textContent = translate(copy);
   for (const option of options) option.setAttribute("aria-pressed", String(option.dataset.scenario === scenario));

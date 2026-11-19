@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024">
+  <defs>
+    <filter id="edge" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+  <path fill="#fff" filter="url(#edge)" d="M-80 674L0 669L145 663L307 656L490 649L618 642L621 365L662 374L663 675L790 675L790 577L838 577L840 677L950 680L1058 685L1146 686L1222 711L1536 719L1616 722V1120H-80Z"/>
+</svg>

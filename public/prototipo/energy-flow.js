@@ -44,7 +44,11 @@ drawEnergyRoute(storyFlow, "battery", [[146,223],[270,223],[270,152],[429,152]])
 storyFlow.closest("[data-flow-diagram]").classList.add("flow-ready");
 
 for (const diagram of flowDiagrams) {
+  if (flowObserver) flowObserver.observe(diagram);
+  else diagram.classList.add("flow-in-view");
+
   const toggle = diagram.querySelector(".flow-toggle");
+  if (!toggle) continue;
   const [pauseLabel, resumeLabel] = toggle.querySelectorAll("span");
 
   toggle.addEventListener("click", () => {
@@ -56,9 +60,6 @@ for (const diagram of flowDiagrams) {
   function adaptFlowToPreference() {
     toggle.hidden = flowPreference.matches;
   }
-
-  if (flowObserver) flowObserver.observe(diagram);
-  else diagram.classList.add("flow-in-view");
 
   adaptFlowToPreference();
   flowPreference.addEventListener("change", adaptFlowToPreference);
