@@ -1,6 +1,17 @@
 {
   "routes": [
     {
+      "src": "/prototipo",
+      "status": 308,
+      "headers": {
+        "Location": "/prototipo/"
+      }
+    },
+    {
+      "src": "/prototipo/",
+      "dest": "/prototipo/index.html"
+    },
+    {
       "handle": "filesystem"
     },
     {
