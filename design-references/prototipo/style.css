@@ -128,7 +128,7 @@ body:not([data-page=home]) .brand img{filter:brightness(0) saturate(100%)}
 }
 
 /* Scroll motion leaves the reading order and page layout intact. */
-[data-motion=enabled] [data-reveal]{transition:opacity .65s ease,transform .65s cubic-bezier(.2,.65,.3,1)}
+[data-motion=enabled] [data-reveal]{transition:opacity .9s ease,transform .9s cubic-bezier(.2,.65,.3,1)}
 [data-motion=enabled] [data-reveal]:not([data-revealed=true]):not(:focus-within){opacity:.38;transform:translateY(24px)}
 
 .home-technology-layout{grid-template-columns:1fr}
@@ -221,10 +221,7 @@ body[data-motion=enabled][data-page=home] :is(.hero-backdrop,.hero-foreground){
   clip-path:inset(0 0 var(--hero-shift,0px) 0);
 }
 .hero-credit{
-  position:absolute;
-  bottom:18px;
-  right:0;
-  z-index:3;
+  margin-top: .65rem;
   color:#dbe8e2;
   font:.68rem/1.4 var(--mono);
 }
@@ -255,7 +252,7 @@ body[data-page=home] .hero-foreground{display:block}
   mask-repeat:no-repeat;
 }
 .hero-foreground .hero-wall-art{
-  mask-image:url("recorte-murete-vertical.svg?v=upper-edge"),linear-gradient(#000 0 85%,transparent 100%);
+  mask-image:url("recorte-murete-vertical.svg?v=wall-edge-fit"),linear-gradient(#000 0 85%,transparent 100%);
   mask-composite:intersect;
 }
 .hero-wall-art img{display:block;width:100%;height:auto}
@@ -271,12 +268,16 @@ body[data-page=home] .hero-foreground{display:block}
   height:var(--opening-continuation-height);
   background:none;
 }
-[data-motion=enabled] .hero-cinema h1{
-  position:relative;
-  z-index:1;
-  transform:translateY(var(--headline-shift-y,0px));
+[data-motion=enabled] .hero-cinema .hero-copy {
+  position: relative;
+  z-index: 1;
+  transform: translateY(var(--hero-copy-y, 0px));
 }
-.hero-description{position:relative;z-index:3}
+[data-motion=enabled] .hero-cinema[data-content-exited] .hero-copy { visibility: hidden; }
+[data-motion=enabled] .hero-cinema .hero-copy:has(:focus-visible) {
+  transform: translateY(var(--hero-copy-start, 0px));
+}
+
 @media(max-width:760px){
   body[data-page=home]{
     --opening-continuation-height:clamp(130px,21svh,210px);
@@ -284,9 +285,19 @@ body[data-page=home] .hero-foreground{display:block}
     --scene-position-y:.5;
     --scene-lift:clamp(-155px,calc(344px - 59svh),-68px);
   }
-  .hero.hero-cinema h1{margin-bottom:calc(.62em + 18px)}
+  .hero.hero-cinema h1 {
+    font-size: clamp(2.15rem, 8vw, 3.8rem);
+    margin-bottom: .55em;
+  }
+  .hero-cinema .hero-description .intro { font-size: .94rem; max-width: none; }
+  .hero-cinema .actions { gap: .55rem 1rem; margin-top: .8rem; font-size: .86rem; }
+  .hero-cinema .actions .button { padding-inline: .65rem; gap: .4rem; }
+  body[data-page=home][data-motion=enabled] .hero-wall-art {
+    margin-top: clamp(20px, calc(385px - 81vw), 128px);
+  }
+
 }
-@media(min-width:761px){.hero.hero-cinema h1{margin-bottom:clamp(100px,17.4vh,165px)}}
+@media(min-width:761px){.hero.hero-cinema h1{margin-bottom:clamp(18px,3.2vh,34px)}}
 
 
 .mobility-chapter{
@@ -351,7 +362,7 @@ body[data-page=tecnologia] .top .header-cta{color:#f2f8f1;background:#23463a;bor
   stroke-width:4;
   stroke-linecap:round;
   stroke-dasharray:8 28;
-  animation:dc-dashes 1.15s linear infinite paused;
+  animation:dc-dashes var(--flow-duration, 1.15s) linear infinite paused;
   vector-effect:non-scaling-stroke;
 }
 @keyframes dc-dashes{
@@ -823,7 +834,9 @@ body[data-page=tecnologia] .top .header-cta{color:#f2f8f1;background:#23463a;bor
   align-items: start;
 }
 .principles-intro h2 { max-width: 12ch; font-weight: 550; }
-.technology .ems-note { border-color: #a6b8ad; }
+.technology .ems-note { border-color: #a6b8ad; padding-block: .85rem; }
+.technology .ems-note h3 { font-size: 1rem; letter-spacing: normal; }
+.technology .ems-note p { margin-top: .5rem; color: var(--muted); }
 .technology .ems-note span { color: #415c4a; }
 .technology .benefits { display: block; margin: 0; }
 .technology .benefits article {
@@ -851,3 +864,120 @@ body[data-page=tecnologia] .top .header-cta{color:#f2f8f1;background:#23463a;bor
   .network-toolbar .switch button { padding-inline: .65em; }
   .tech-principles .benefit-drawing { width: 38px; }
 }
+
+#amount[hidden] { display: none; }
+#estimate-comparison h3, #estimate-comparison h4 { font-size: .96rem; margin: .9rem 0 .35rem; }
+#estimate-comparison #capacity-value { font-size: clamp(1.4rem, 3vw, 2.25rem); line-height: 1.15; }
+.network-costs { margin: 0; }
+.network-costs div { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--line); padding: .45rem 0; }
+.network-costs dd { margin: 0; font-variant-numeric: tabular-nums; }
+.network-costs div:last-child { color: var(--green); font-weight: 650; }
+.map-actions { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin-top: 1rem; }
+.map-actions a { min-height: 44px; }
+.map-actions [hidden] { display: none; }
+
+
+.ems-cloud {
+  grid-area: 1 / 5 / 2 / 7;
+  place-self: start end;
+  width: min(100%, 7.5rem);
+  transform: translate(clamp(2px, .5vw, 8px), clamp(-15px, -1vw, -5px));
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  text-align: center;
+  color: #425c53;
+  font-size: clamp(.66rem, .86vw, .81rem);
+  line-height: 1.15;
+}
+.ems-cloud svg { display: block; width: min(82px, 85%); }
+.ems-cloud path { fill: #f7faf6; stroke: #788e82; stroke-width: 1.6; }
+.ems-cloud text { fill: #304c42; font-size: 18px; font-weight: 650; }
+
+.network[data-mode=peak] .battery .node-charging { display: none; }
+.technology .network[data-mode=solar] .battery { background: var(--flow-surface); border-color: var(--flow); }
+.technology .network .battery .node-charging { color: var(--flow); font-weight: 700; }
+.network[data-mode=solar] .battery::before {
+  bottom: calc(100% + 5px);
+  border-top: 8px solid var(--flow);
+}
+.flow-ready.network .node::after { display: none; }
+
+.wiring-flow .energy-track {
+  stroke: #677471;
+  stroke-width: 5px;
+  stroke-linecap: round;
+}
+.wiring-flow .energy-line {
+  stroke: #c5ffbe;
+  stroke-width: 2px;
+  stroke-dasharray: 8 28;
+  filter: drop-shadow(0 0 1px currentColor);
+  color: #c5ffbe;
+}
+.network[data-mode=peak] .wiring-flow .energy-line { stroke: #ffe0a1; color: #ffe0a1; }
+@media (prefers-reduced-motion: reduce) {
+  .wiring-flow .energy-line { display: none; }
+}
+
+.network .node::before,
+.network .bus-arrow { display: none; }
+
+.technology .wiring {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) minmax(72px, 16%);
+}
+.wiring .bus { grid-column: 1 / 7; }
+.wiring .dc-loads {
+  grid-column: 7;
+  grid-row: 2;
+  min-height: 0;
+  padding: .36rem .2rem;
+}
+.wiring .dc-loads span { font-size: .64rem; }
+@media (max-width: 480px) {
+  .technology .wiring { column-gap: 4px; }
+}
+
+.wiring .grid { grid-row: 2; }
+.technology .network .bus strong {
+  position: absolute;
+  left: 41%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: .18rem .3rem;
+  font-size: clamp(.53rem, 1.4vw, .66rem);
+  max-width: calc(16.6667% - 6px);
+  text-align: center;
+  line-height: 1.12;
+}
+
+#capacity-rating { font-size: .55em; font-weight: 500; letter-spacing: normal; white-space: nowrap; }
+
+.story-visual:not([data-stage=solar]) .battery-charge,
+.story-visual[data-stage=solar] .battery-feed.arrow-head { display: none; }
+.story-visual[data-stage=solar] .battery-charge { stroke: var(--signal); }
+.flow-ready.story-visual[data-stage=solar] :is(.battery-feed:not(.arrow-head), .rail-battery) { stroke: transparent; }
+.story-visual[data-stage=solar] .story-battery circle { fill: #fffdf6; stroke: var(--signal); stroke-width: 2.4; }
+.story-visual[data-stage=solar] .story-battery :is(text, .equipment-icon) { color: var(--signal); }
+
+.lighting-card-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .74fr);
+  align-items: start;
+  gap: clamp(.75rem, 2.5vw, 2rem);
+}
+.map-card-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .3rem;
+  min-height: 44px;
+  color: var(--green);
+  font-size: clamp(.78rem, 1.2vw, 1rem);
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: right;
+}
+.map-card-link:hover > span { text-decoration: underline; }
+#map-preview { flex: 0 0 clamp(28px, 4vw, 60px); width: clamp(28px, 4vw, 60px); height: clamp(44px, 5.2vw, 74px); }
+#map-preview path { fill: #276c55; stroke: #eaf1e9; stroke-width: .65px; vector-effect: non-scaling-stroke; }

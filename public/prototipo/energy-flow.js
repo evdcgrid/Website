@@ -8,10 +8,11 @@ function makeFlowElement(name, attributes = {}) {
   return element;
 }
 
-function drawEnergyRoute(layer, name, points) {
+function drawEnergyRoute(layer, name, points, speed) {
   const route = makeFlowElement("g", {"class":"energy-route","data-energy-route":name});
   const wavelength = 36;
   let distance = 0;
+  if (speed) route.style.setProperty("--flow-duration", wavelength / speed + "s");
 
   for (let i = 1; i < points.length; i++) {
     const [x1, y1] = points[i - 1];
@@ -38,7 +39,7 @@ const flowObserver = "IntersectionObserver" in window
   : null;
 
 const storyFlow = document.querySelector(".story-visual .energy-flow-layer");
-drawEnergyRoute(storyFlow, "solar", [[146,84],[270,84],[270,152]]);
+drawEnergyRoute(storyFlow, "solar", [[146,84],[270,84],[270,223],[146,223]]);
 drawEnergyRoute(storyFlow, "bus", [[146,84],[270,84],[270,152],[429,152]]);
 drawEnergyRoute(storyFlow, "battery", [[146,223],[270,223],[270,152],[429,152]]);
 storyFlow.closest("[data-flow-diagram]").classList.add("flow-ready");
@@ -69,6 +70,8 @@ const wiring = document.querySelector(".wiring");
 const wiringDiagram = wiring.closest("[data-flow-diagram]");
 const wiringFlow = wiring.querySelector(".energy-flow-layer");
 const powerBus = wiring.querySelector(".bus");
+const dcLoadsNode = wiring.querySelector(".dc-loads");
+const gridNode = wiring.querySelector(".grid");
 const solarNode = wiring.querySelector(".solar");
 const batteryNode = wiring.querySelector(".battery");
 const chargingNode = wiring.querySelector(".ev");
@@ -77,6 +80,8 @@ function updateWiringFlow() {
   const bounds = wiring.getBoundingClientRect();
   if (!bounds.width || !bounds.height) return;
 
+  const dcLoads = dcLoadsNode.getBoundingClientRect();
+  const grid = gridNode.getBoundingClientRect();
   const solar = solarNode.getBoundingClientRect();
   const battery = batteryNode.getBoundingClientRect();
   const charger = chargingNode.getBoundingClientRect();
@@ -88,11 +93,23 @@ function updateWiringFlow() {
   const solarX = centerX(solar);
   const batteryX = centerX(battery);
 
-  wiringFlow.replaceChildren(
-    makeFlowElement("line", {"class":"idle-bus", x1:bus.left - bounds.left, y1:busY, x2:solarX, y2:busY}),
-    makeFlowElement("line", {"class":"idle-bus", x1:chargerX, y1:busY, x2:bus.right - bounds.left, y2:busY}),
-  );
-  drawEnergyRoute(wiringFlow,"solar",[[solarX,solar.bottom - bounds.top],[solarX,busY],...destination]);
+  const rightEnd = dcLoads.left - bounds.left;
+  const tracks = [
+    [grid.right - bounds.left, busY, rightEnd, busY],
+    [solarX, solar.bottom - bounds.top, solarX, busY],
+    [batteryX, busY, batteryX, battery.top - bounds.top],
+    [chargerX, busY, chargerX, charger.top - bounds.top],
+  ];
+  wiringFlow.replaceChildren(...tracks.map(([x1, y1, x2, y2]) =>
+    makeFlowElement("line", {class: "energy-track", x1, y1, x2, y2})
+  ));
+  const evSpeed = 60;
+  const batterySpeed = 30;
+  const solarSpeed = evSpeed + batterySpeed;
+  const junction = [Math.max(solarX, batteryX), busY];
+  drawEnergyRoute(wiringFlow, "solar", [[solarX,solar.bottom - bounds.top],[solarX,busY],junction], solarSpeed);
+  drawEnergyRoute(wiringFlow, "solar", [junction,...destination], evSpeed);
+  drawEnergyRoute(wiringFlow, "solar", [junction,[batteryX,busY],[batteryX,battery.top - bounds.top]], batterySpeed);
   drawEnergyRoute(wiringFlow,"peak",[[batteryX,battery.top - bounds.top],[batteryX,busY],...destination]);
   wiringDiagram.classList.add("flow-ready");
 }
@@ -100,7 +117,7 @@ function updateWiringFlow() {
 updateWiringFlow();
 if ("ResizeObserver" in window) {
   const wiringObserver = new ResizeObserver(updateWiringFlow);
-  for (const element of [wiring, solarNode, batteryNode, chargingNode]) wiringObserver.observe(element);
+  for (const element of [wiring, dcLoadsNode, gridNode, solarNode, batteryNode, chargingNode]) wiringObserver.observe(element);
 } else {
   addEventListener("resize", updateWiringFlow);
 }

@@ -1,6 +1,6 @@
 const network = document.querySelector(".network");
 const flowDescriptions = {
-  solar: "O solar alimenta o carregamento pelo barramento DC, evitando uma passagem intermédia por AC.",
+  solar: "Durante o dia, o solar alimenta os carregadores e carrega a bateria pelo barramento DC.",
   peak: "A bateria cobre parte do pico de carregamento e reduz a potência pedida à rede nesse momento.",
 };
 
@@ -38,7 +38,7 @@ function populate(select, items, placeholder, value = "") {
   select.disabled = items.length === 0;
 }
 
-function renderMap(items, selected, select) {
+function renderMap(items, selected, select, target = territory) {
   const bounds = [Infinity, Infinity, -Infinity, -Infinity];
   const shapes = items.map(([name, key, rings]) => {
     const path = document.createElementNS(svgNamespace, "path");
@@ -52,6 +52,7 @@ function renderMap(items, selected, select) {
     path.setAttribute("d", data);
     path.setAttribute("fill-rule", "evenodd");
     path.dataset.selected = String(key === selected);
+    if (!select) return path;
     const title = document.createElementNS(svgNamespace, "title");
     title.textContent = name;
     path.append(title);
@@ -64,34 +65,47 @@ function renderMap(items, selected, select) {
   const width = bounds[2] - bounds[0];
   const height = bounds[3] - bounds[1];
   const padding = Math.max(width, height) * .06;
-  territory.setAttribute("viewBox", shapes.length
+  target.setAttribute("viewBox", shapes.length
     ? [bounds[0] - padding, bounds[1] - padding, width + padding * 2, height + padding * 2].join(" ")
     : "0 0 440 440");
-  territory.replaceChildren(...shapes);
+  target.replaceChildren(...shapes);
 }
+
+renderMap(territoryData.districts, "", null, document.querySelector("#map-preview"));
 
 function selectedName(select) {
   return select.value ? select.selectedOptions[0].textContent : "";
 }
 
 function showEstimate(value, message, period = "", ac, acChargers, dcChargers) {
-  const currency = new Intl.NumberFormat(language === "en" ? "en-GB" : "pt-PT", {style:"currency",currency:"EUR",maximumFractionDigits:0});
-  const comparison = document.querySelector("#estimate-comparison");
-  comparison.hidden = typeof value !== "number" || typeof ac !== "number";
-  if (!comparison.hidden) {
-    document.querySelector("#amount-ac").textContent = currency.format(ac);
-    const number = new Intl.NumberFormat(language === "en" ? "en-GB" : "pt-PT");
-    const gain = dcChargers - acChargers;
-    document.querySelector("#charger-gain").textContent = gain > 0
-      ? translate("{count} carregadores adicionais em DC").replace("{count}", number.format(gain))
-      : "";
-    document.querySelector("#charger-comparison").textContent = translate("{ac} em AC e {dc} em DC")
-      .replace("{ac}", number.format(acChargers)).replace("{dc}", number.format(dcChargers));
+  const locale = language === "en" ? "en-GB" : "pt-PT";
+  function compact(n, money = false) {
+    const scale = n >= 1e6 ? 1e6 : n >= 1e3 ? 1e3 : 1;
+    const digits = scale === 1e6 ? 2 : scale === 1e3 && !money ? 1 : 0;
+    const amount = (n / scale).toLocaleString(locale, {maximumFractionDigits: digits});
+    const unit = scale === 1e6 ? "M" : scale === 1e3 ? "k" : "";
+    if (language === "en") return (money ? "€" : "") + amount + unit;
+    return amount + (unit || money ? " " : "") + unit + (money ? "€" : "");
   }
-  estimate.dataset.status = typeof value === "number" ? "value" : "message";
-  estimate.textContent = typeof value === "number"
-    ? currency.format(value)
-    : translate(value);
+  const comparison = document.querySelector("#estimate-comparison");
+  comparison.hidden = ![value, ac, acChargers, dcChargers].every(Number.isFinite);
+  if (!comparison.hidden) {
+    const gain = dcChargers - acChargers;
+    const difference = ac - value;
+    const totalLabel = dcChargers === 1 ? "{n} carregador" : "{n} carregadores";
+    const gainLabel = gain === 0 ? "Mesmo número de carregadores que em AC" : gain > 0 ? "Mais {n} do que em AC" : "Menos {n} do que em AC";
+    document.querySelector("#capacity-count").textContent = translate(totalLabel).replace("{n}", compact(dcChargers));
+    document.querySelector("#capacity-rating").textContent = translate(dcChargers === 1 ? "(11 kW)" : "(11 kW cada)");
+    document.querySelector("#capacity-gain").textContent = translate(gainLabel).replace("{n}", compact(Math.abs(gain)));
+    document.querySelector("#dc-cost").textContent = compact(value, true);
+    document.querySelector("#ac-cost").textContent = compact(ac, true);
+    document.querySelector("#cost-label").textContent = translate(difference < 0 ? "Investimento adicional" : "Poupança estimada");
+    document.querySelector("#cost-value").textContent = compact(Math.abs(difference), true);
+  }
+  estimate.hidden = !comparison.hidden;
+  estimate.dataset.status = "message";
+  if (comparison.hidden) estimate.textContent = typeof value === "number" ? compact(value, true) : translate(value);
+  estimateMessage.hidden = !comparison.hidden;
   estimateMessage.textContent = translate(message);
   document.querySelector("#period").textContent = period ? translate("Período dos dados") + ": " + period + "." : "";
 }
@@ -159,6 +173,11 @@ function refreshMap() {
   const parishes = territoryData.parishes[district.value + "/" + municipality.value] || [];
   const level = municipality.value ? "Freguesias" : district.value ? "Concelhos" : "Distritos";
   document.querySelector("#map-level").textContent = translate(level);
+  const explore = document.querySelector("#map-explore");
+  const next = !district.value ? district : !municipality.value ? municipality : parish;
+  explore.hidden = Boolean(parish.value) || next.disabled;
+  explore.href = "#" + next.id;
+  explore.textContent = translate(next === district ? "Explorar por distrito" : next === municipality ? "Explorar por concelho" : "Explorar por freguesia");
   mapBack.hidden = !district.value;
   if (municipality.value && parishes.length) renderMap(parishes, parish.value, parish);
   else if (district.value && towns.length) renderMap(towns, municipality.value, municipality);
